@@ -1,0 +1,50 @@
+version: "3"
+services:
+  monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile-psql
+    restart: unless-stopped
+    command: monitor
+    hostname: monitor
+    volumes:
+      - monitor:/var/lib/postgresql
+  node_1:
+    build:
+      context: .
+      dockerfile: Dockerfile-psql
+    restart: unless-stopped
+    command: db-server
+    hostname: node_1
+    depends_on:
+      - monitor
+    volumes:
+      - node_1:/var/lib/postgresql
+  node_2:
+    build:
+      context: .
+      dockerfile: Dockerfile-psql
+    restart: unless-stopped
+    command: db-server
+    hostname: node_2
+    depends_on:
+      - monitor
+    volumes:
+      - node_2:/var/lib/postgresql
+  haproxy:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile-haproxy
+    hostname: haproxy
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    ports:
+      - 4000:4000
+      - 5000:5000
+      - 5001:5001
+
+volumes:
+  node_1:
+  node_2:
+  monitor:

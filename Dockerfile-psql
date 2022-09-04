@@ -1,0 +1,24 @@
+FROM postgres:14.5
+
+RUN apt-get update && apt-get install -y curl && \
+  curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+  echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+
+# FIXME: install a specific version!
+RUN apt-get update && apt-get install -y \
+  pg-auto-failover-cli \
+  postgresql-14-auto-failover \
+  sudo
+
+RUN mkdir -p /etc/pgaf_swarm/
+COPY pg_hba_monitor.conf /etc/pgaf_swarm/pg_hba_monitor.conf
+COPY pg_hba_node.conf /etc/pgaf_swarm/pg_hba_node.conf
+
+COPY entrypoint.sh /usr/bin/entrypoint
+RUN chmod +x /usr/bin/entrypoint
+
+RUN mkdir -p /var/lib/postgresql/data
+RUN chown -R postgres:postgres /var/lib/postgresql
+
+USER root
+ENTRYPOINT ["entrypoint"]
