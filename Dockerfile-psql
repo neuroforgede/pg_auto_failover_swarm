@@ -10,9 +10,10 @@ RUN apt-get update && apt-get install -y \
   postgresql-14-auto-failover \
   sudo
 
-RUN mkdir -p /etc/pgaf_swarm/
-COPY pg_hba_monitor.conf /etc/pgaf_swarm/pg_hba_monitor.conf
-COPY pg_hba_node.conf /etc/pgaf_swarm/pg_hba_node.conf
+RUN mkdir -p /etc/pgaf/
+COPY pg_hba_monitor.conf /etc/pgaf/pg_hba_monitor.conf
+COPY pg_hba_node.conf /etc/pgaf/pg_hba_node.conf
+COPY postgresql.custom.conf /etc/pgaf/postgresql.custom.conf
 
 COPY entrypoint.sh /usr/bin/entrypoint
 RUN chmod +x /usr/bin/entrypoint

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+check_result () {
+    ___RESULT=$?
+    if [ $___RESULT -ne 0 ]; then
+        echo $1
+        exit 1
+    fi
+}
+
 # base structure of this file is from https://gist.github.com/nicosingh/9583fe487bddf853c38a5b8c9db2cf7a
 
 # initially from from https://github.com/docker-library/postgres/blob/master/15/bullseye/docker-entrypoint.sh
@@ -26,8 +34,10 @@ create_monitor() {
   sudo -u postgres /usr/bin/pg_autoctl create monitor \
     --pgdata /var/lib/postgresql/data/cluster \
     --pgctl /usr/lib/postgresql/14/bin/pg_ctl \
+    --hostname $(hostname) \
     --skip-pg-hba \
     --no-ssl
+  check_result "failed to create monitor"
   # FIXME: check error codes
 }
 
@@ -41,24 +51,37 @@ create_postgres() {
     --pgctl /usr/lib/postgresql/14/bin/pg_ctl \
     --skip-pg-hba \
     --no-ssl
+  check_result "failed to create postgres"
   # FIXME: check error codes
 }
 
-# FIXME: mount pg_hba.conf
-#        mount postgresql.conf
+setup_postgresql_conf() {
+  cp /etc/pgaf/postgresql.custom.conf /var/lib/postgresql/data/cluster/postgresql.custom.conf
+  check_result "failed to copy /etc/pgaf/postgresql.custom.conf to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
+  chown postgres:postgres /var/lib/postgresql/data/cluster/postgresql.custom.conf
+  check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
+  LINE="include 'postgresql.custom.conf'"
+  FILE="/var/lib/postgresql/data/cluster/postgresql.conf"
+  grep -qF -- "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
+  check_result "failed to append inclusion of custom config file to $FILE"
+}
 
 setup_hba_monitor() {
-  cp /etc/pgaf_swarm/pg_hba_monitor.conf /var/lib/postgresql/data/cluster/pg_hba.conf || exit 1
+  cp /etc/pgaf/pg_hba_monitor.conf /var/lib/postgresql/data/cluster/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/pg_hba_monitor.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
   chown postgres:postgres /var/lib/postgresql/data/cluster/pg_hba.conf
+  check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/pg_hba.conf"
 }
 
 setup_hba_node() {
-  cp /etc/pgaf_swarm/pg_hba_node.conf /var/lib/postgresql/data/cluster/pg_hba.conf || exit 1
+  cp /etc/pgaf/pg_hba_node.conf /var/lib/postgresql/data/cluster/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/pg_hba_node.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
   chown postgres:postgres /var/lib/postgresql/data/cluster/pg_hba.conf
+  check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/pg_hba.conf"
 }
 
 pg_autoctl_run() {
-  echo "[entrypoint] starting postgres..."
+  echo "starting postgres..."
   exec sudo -u postgres /usr/bin/pg_autoctl run --pgdata /var/lib/postgresql/data/cluster
 }
 
@@ -66,12 +89,14 @@ case "${@}" in
 monitor)
   docker_create_db_directories
   create_monitor
+  setup_postgresql_conf
   setup_hba_monitor
   pg_autoctl_run
   ;;
 db-server)
   docker_create_db_directories
   create_postgres
+  setup_postgresql_conf
   setup_hba_node
   pg_autoctl_run
   ;;
