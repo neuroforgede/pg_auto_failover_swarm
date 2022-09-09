@@ -1,0 +1,136 @@
+version: "3.8"
+services:
+  monitor:
+    image: none.local/pgaf:latest
+    command: monitor
+    networks:
+      pgaf:
+        aliases:
+          - monitor.local
+    environment:
+      PGAF_SSL_MODE: verify-ca
+      PGAF_HOSTNAME: monitor.local
+      PGAF_NAME: monitor.local
+      PGAF_MONITOR_HOSTNAME: monitor.local
+    secrets:
+      - source: monitor_ssl_ca
+        target: ssl_ca
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: monitor_ssl_cert
+        target: ssl_cert
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: monitor_ssl_key
+        target: ssl_key
+        uid: '999'
+        gid: '999'
+        mode: 0600
+    volumes:
+      - monitor:/var/lib/postgresql
+  
+  node_1:
+    image: none.local/pgaf:latest
+    command: db-server
+    networks:
+      pgaf:
+        aliases:
+          - node1.local
+    environment:
+      PGAF_SSL_MODE: verify-ca
+      PGAF_HOSTNAME: node1.local
+      PGAF_NAME: node1.local
+      PGAF_MONITOR_HOSTNAME: monitor.local
+    secrets:
+      - source: node_1_ssl_ca
+        target: ssl_ca
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: node_1_ssl_cert
+        target: ssl_cert
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: node_1_ssl_key
+        target: ssl_key
+        uid: '999'
+        gid: '999'
+        mode: 0600
+    volumes:
+      - node_1:/var/lib/postgresql
+  
+  node_2:
+    image: none.local/pgaf:latest
+    command: db-server
+    networks:
+      pgaf:
+        aliases:
+          - node2.local
+    environment:
+      PGAF_SSL_MODE: verify-ca
+      PGAF_HOSTNAME: node2.local
+      PGAF_NAME: node2.local
+      PGAF_MONITOR_HOSTNAME: monitor.local
+    secrets:
+      - source: node_2_ssl_ca
+        target: ssl_ca
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: node_2_ssl_cert
+        target: ssl_cert
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: node_2_ssl_key
+        target: ssl_key
+        uid: '999'
+        gid: '999'
+        mode: 0600
+    volumes:
+      - node_2:/var/lib/postgresql
+
+  # haproxy:
+  #   restart: unless-stopped
+  #   image: none.local/haproxy:latest
+  #   hostname: haproxy
+  #   volumes:
+  #     - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+  #   ports:
+  #     - 4000:4000
+  #     - 5000:5000
+  #     - 5001:5001
+
+secrets:
+  monitor_ssl_ca:
+    file: ./test/certs/monitor/postgres_server/rootCA-verification.pem
+  monitor_ssl_cert:
+    file: ./test/certs/monitor/postgres_server/server.crt
+  monitor_ssl_key:
+    file: ./test/certs/monitor/postgres_server/server.key
+
+  node_1_ssl_ca:
+    file: ./test/certs/node_1/postgres_server/rootCA-verification.pem
+  node_1_ssl_cert:
+    file: ./test/certs/node_1/postgres_server/server.crt
+  node_1_ssl_key:
+    file: ./test/certs/node_1/postgres_server/server.key
+
+  node_2_ssl_ca:
+    file: ./test/certs/node_2/postgres_server/rootCA-verification.pem
+  node_2_ssl_cert:
+    file: ./test/certs/node_2/postgres_server/server.crt
+  node_2_ssl_key:
+    file: ./test/certs/node_2/postgres_server/server.key
+
+networks:
+  pgaf:
+    driver: overlay
+
+volumes:
+  node_1:
+  node_2:
+  monitor:

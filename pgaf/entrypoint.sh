@@ -34,9 +34,12 @@ create_monitor() {
   sudo -u postgres /usr/bin/pg_autoctl create monitor \
     --pgdata /var/lib/postgresql/data/cluster \
     --pgctl /usr/lib/postgresql/14/bin/pg_ctl \
-    --hostname $(hostname) \
+    --hostname "${PGAF_HOSTNAME}" \
     --skip-pg-hba \
-    --no-ssl
+    --ssl-ca-file "$PGAF_SSL_CA" \
+    --server-cert "$PGAF_SSL_CERT" \
+    --server-key "$PGAF_SSL_KEY" \
+    --ssl-mode "$PGAF_SSL_MODE"
   check_result "failed to create monitor"
   # FIXME: check error codes
 }
@@ -44,20 +47,25 @@ create_monitor() {
 create_postgres() {
   echo "creating data node..."
   # FIXME: check if already initialized
+  # TODO: make monitor url configurable
   sudo -u postgres /usr/bin/pg_autoctl create postgres \
     --pgdata /var/lib/postgresql/data/cluster \
-    --monitor postgres://autoctl_node@monitor:5432/pg_auto_failover \
-    --hostname $(hostname) \
+    --monitor "postgres://autoctl_node@${PGAF_MONITOR_HOSTNAME}:5432/pg_auto_failover" \
+    --hostname "${PGAF_HOSTNAME}" \
+    --name "${PGAF_NAME}" \
     --pgctl /usr/lib/postgresql/14/bin/pg_ctl \
     --skip-pg-hba \
-    --no-ssl
+    --ssl-ca-file "$PGAF_SSL_CA" \
+    --server-cert "$PGAF_SSL_CERT" \
+    --server-key "$PGAF_SSL_KEY" \
+    --ssl-mode "$PGAF_SSL_MODE"
   check_result "failed to create postgres"
   # FIXME: check error codes
 }
 
 setup_postgresql_conf() {
-  cp /etc/pgaf/postgresql.custom.conf /var/lib/postgresql/data/cluster/postgresql.custom.conf
-  check_result "failed to copy /etc/pgaf/postgresql.custom.conf to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
+  cp /etc/pgaf/ssl/postgresql.custom.conf /var/lib/postgresql/data/cluster/postgresql.custom.conf
+  check_result "failed to copy /etc/pgaf/ssl/postgresql.custom.conf to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
   chown postgres:postgres /var/lib/postgresql/data/cluster/postgresql.custom.conf
   check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
   LINE="include 'postgresql.custom.conf'"
@@ -67,15 +75,15 @@ setup_postgresql_conf() {
 }
 
 setup_hba_monitor() {
-  cp /etc/pgaf/pg_hba_monitor.conf /var/lib/postgresql/data/cluster/pg_hba.conf
-  check_result "failed to copy /etc/pgaf/pg_hba_monitor.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
+  cp /etc/pgaf/ssl/pg_hba_monitor.conf /var/lib/postgresql/data/cluster/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/ssl/pg_hba_monitor.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
   chown postgres:postgres /var/lib/postgresql/data/cluster/pg_hba.conf
   check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/pg_hba.conf"
 }
 
 setup_hba_node() {
-  cp /etc/pgaf/pg_hba_node.conf /var/lib/postgresql/data/cluster/pg_hba.conf
-  check_result "failed to copy /etc/pgaf/pg_hba_node.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
+  cp /etc/pgaf/ssl/pg_hba_node.conf /var/lib/postgresql/data/cluster/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/ssl/pg_hba_node.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
   chown postgres:postgres /var/lib/postgresql/data/cluster/pg_hba.conf
   check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/pg_hba.conf"
 }

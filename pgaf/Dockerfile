@@ -11,15 +11,22 @@ RUN apt-get update && apt-get install -y \
   sudo
 
 RUN mkdir -p /etc/pgaf/
-COPY pg_hba_monitor.conf /etc/pgaf/pg_hba_monitor.conf
-COPY pg_hba_node.conf /etc/pgaf/pg_hba_node.conf
-COPY postgresql.custom.conf /etc/pgaf/postgresql.custom.conf
+RUN mkdir -p /etc/pgaf/ssl
+COPY ssl /etc/pgaf/ssl/
+RUN mkdir -p /etc/pgaf/ssl/certs
 
 COPY entrypoint.sh /usr/bin/entrypoint
 RUN chmod +x /usr/bin/entrypoint
 
 RUN mkdir -p /var/lib/postgresql/data
 RUN chown -R postgres:postgres /var/lib/postgresql
+
+ENV PGAF_SSL_CA /var/run/secrets/ssl_ca
+# TODO: implement CRL support
+# ENV PGAF_SSL_CRL /var/run/secrets/ssl_crl
+ENV PGAF_SSL_CERT /var/run/secrets/ssl_cert
+ENV PGAF_SSL_KEY /var/run/secrets/ssl_key
+ENV PGAF_SSL_MODE verify-ca
 
 USER root
 ENTRYPOINT ["entrypoint"]

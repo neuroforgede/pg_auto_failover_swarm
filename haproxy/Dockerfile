@@ -1,4 +1,3 @@
-FROM haproxy:2.5
 
 USER root
 
