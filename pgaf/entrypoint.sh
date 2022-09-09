@@ -63,6 +63,11 @@ create_postgres() {
   # FIXME: check error codes
 }
 
+setup_pg_ident_conf() {
+  cp /etc/pgaf/ssl/pg_ident.conf /var/lib/postgresql/data/cluster/pg_ident.conf
+  check_result "failed to copy /etc/pgaf/ssl/pg_ident.conf to /var/lib/postgresql/data/cluster/pg_ident.conf"
+}
+
 setup_postgresql_conf() {
   cp /etc/pgaf/ssl/postgresql.custom.conf /var/lib/postgresql/data/cluster/postgresql.custom.conf
   check_result "failed to copy /etc/pgaf/ssl/postgresql.custom.conf to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
@@ -97,6 +102,7 @@ case "${@}" in
 monitor)
   docker_create_db_directories
   create_monitor
+  setup_pg_ident_conf
   setup_postgresql_conf
   setup_hba_monitor
   pg_autoctl_run
@@ -104,6 +110,7 @@ monitor)
 db-server)
   docker_create_db_directories
   create_postgres
+  setup_pg_ident_conf
   setup_postgresql_conf
   setup_hba_node
   pg_autoctl_run
