@@ -33,7 +33,8 @@ services:
   
   node_1:
     image: none.local/pgaf:latest
-    command: db-server
+    entrypoint: /bin/bash -c 'tail -f /dev/null'
+    command: []
     networks:
       pgaf:
         aliases:

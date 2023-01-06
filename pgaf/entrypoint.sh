@@ -20,6 +20,11 @@ docker_create_db_directories() {
   # ignore failure since there are cases where we can't chmod (and PostgreSQL might fail later anyhow - it's picky about permissions of this directory)
   chmod 700 "/var/lib/postgresql/data" || :
 
+  mkdir -p /var/lib/postgresql/.postgresql
+  ln -s /var/run/secrets/ssl_key /var/lib/postgresql/.postgresql/postgresql.key
+  ln -s /var/run/secrets/ssl_cert /var/lib/postgresql/.postgresql/postgresql.crt
+  chown -R postgres:postgres /var/lib/postgresql/.postgresql
+
   mkdir -p /var/lib/postgresql/data/cluster
   chown -R postgres:postgres /var/lib/postgresql/data
 
