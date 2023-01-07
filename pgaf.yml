@@ -116,6 +116,35 @@ services:
         gid: '999'
         mode: 0600
 
+  # simple showcase how to get a psql shell to run bootstrap SQL code
+  bootstrap:
+    image: none.local/pgaf:latest
+    command: psql < /bootstrap.sql
+    networks:
+      pgaf:
+    configs:
+      - source: bootstrap_sql
+        target: /bootstrap.sql
+        uid: '999'
+        gid: '999'
+        mode: 0600
+    secrets:
+      - source: admin_ssl_ca
+        target: ssl_ca
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: admin_ssl_cert
+        target: ssl_cert
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: admin_ssl_key
+        target: ssl_key
+        uid: '999'
+        gid: '999'
+        mode: 0600
+
   # haproxy:
   #   restart: unless-stopped
   #   image: none.local/haproxy:latest
@@ -148,6 +177,10 @@ secrets:
     file: ./test/certs/admin/postgres_server/server.crt
   admin_ssl_key:
     file: ./test/certs/admin/postgres_server/server.key
+
+configs:
+  bootstrap_sql:
+    file: ./bootstrap/bootstrap.sql
 
 networks:
   pgaf:

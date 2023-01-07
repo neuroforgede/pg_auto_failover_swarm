@@ -69,13 +69,13 @@ create_postgres() {
 }
 
 setup_pg_ident_conf() {
-  cp /etc/pgaf/ssl/pg_ident.conf /var/lib/postgresql/data/cluster/pg_ident.conf
-  check_result "failed to copy /etc/pgaf/ssl/pg_ident.conf to /var/lib/postgresql/data/cluster/pg_ident.conf"
+  cp /etc/pgaf/config/pg_ident.conf /var/lib/postgresql/data/cluster/pg_ident.conf
+  check_result "failed to copy /etc/pgaf/config/pg_ident.conf to /var/lib/postgresql/data/cluster/pg_ident.conf"
 }
 
 setup_postgresql_conf() {
-  cp /etc/pgaf/ssl/postgresql.custom.conf /var/lib/postgresql/data/cluster/postgresql.custom.conf
-  check_result "failed to copy /etc/pgaf/ssl/postgresql.custom.conf to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
+  cp /etc/pgaf/config/postgresql.custom.conf /var/lib/postgresql/data/cluster/postgresql.custom.conf
+  check_result "failed to copy /etc/pgaf/config/postgresql.custom.conf to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
   chown postgres:postgres /var/lib/postgresql/data/cluster/postgresql.custom.conf
   check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
   LINE="include 'postgresql.custom.conf'"
@@ -85,15 +85,15 @@ setup_postgresql_conf() {
 }
 
 setup_hba_monitor() {
-  cp /etc/pgaf/ssl/pg_hba_monitor.conf /var/lib/postgresql/data/cluster/pg_hba.conf
-  check_result "failed to copy /etc/pgaf/ssl/pg_hba_monitor.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
+  cp /etc/pgaf/config/pg_hba_monitor.conf /var/lib/postgresql/data/cluster/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/config/pg_hba_monitor.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
   chown postgres:postgres /var/lib/postgresql/data/cluster/pg_hba.conf
   check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/pg_hba.conf"
 }
 
 setup_hba_node() {
-  cp /etc/pgaf/ssl/pg_hba_node.conf /var/lib/postgresql/data/cluster/pg_hba.conf
-  check_result "failed to copy /etc/pgaf/ssl/pg_hba_node.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
+  cp /etc/pgaf/config/pg_hba_node.conf /var/lib/postgresql/data/cluster/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/config/pg_hba_node.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
   chown postgres:postgres /var/lib/postgresql/data/cluster/pg_hba.conf
   check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/pg_hba.conf"
 }
