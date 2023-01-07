@@ -93,6 +93,29 @@ services:
     volumes:
       - node_2:/var/lib/postgresql
 
+  admin:
+    image: none.local/pgaf:latest
+    entrypoint: /bin/bash -c 'tail -f /dev/null'
+    command: []
+    networks:
+      pgaf:
+    secrets:
+      - source: admin_ssl_ca
+        target: ssl_ca
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: admin_ssl_cert
+        target: ssl_cert
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: admin_ssl_key
+        target: ssl_key
+        uid: '999'
+        gid: '999'
+        mode: 0600
+
   # haproxy:
   #   restart: unless-stopped
   #   image: none.local/haproxy:latest
@@ -118,6 +141,13 @@ secrets:
     file: ./test/certs/postgres/postgres_server/server.crt
   postgres_ssl_key:
     file: ./test/certs/postgres/postgres_server/server.key
+
+  admin_ssl_ca:
+    file: ./test/certs/admin/postgres_server/rootCA-verification.pem
+  admin_ssl_cert:
+    file: ./test/certs/admin/postgres_server/server.crt
+  admin_ssl_key:
+    file: ./test/certs/admin/postgres_server/server.key
 
 networks:
   pgaf:

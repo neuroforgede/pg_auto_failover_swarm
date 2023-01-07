@@ -103,6 +103,18 @@ pg_autoctl_run() {
   exec sudo -u postgres /usr/bin/pg_autoctl run --pgdata /var/lib/postgresql/data/cluster
 }
 
+run_sql() {
+  exec sudo -u postgres psql \
+    "host=node1.local,node2.local \
+    user=postgres \
+    sslkey=$PGAF_SSL_KEY \
+    sslcert=$PGAF_SSL_CERT \
+    sslmode=verify-ca \
+    sslrootcert=$PGAF_SSL_CA \
+    target_session_attrs=read-write" \
+    "$@"
+}
+
 case "${@}" in
 monitor)
   docker_create_db_directories
@@ -119,6 +131,10 @@ db-server)
   setup_postgresql_conf
   setup_hba_node
   pg_autoctl_run
+  ;;
+run-sql)
+  shift
+  run_sql "$@"
   ;;
 *)
   echo "command '${@}' not supported"
