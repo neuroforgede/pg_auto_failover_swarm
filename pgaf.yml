@@ -117,6 +117,7 @@ services:
         mode: 0600
 
   # simple showcase how to get a psql shell to run bootstrap SQL code
+  # in prod, you probably dont want to run this on every deploy
   bootstrap:
     image: none.local/pgaf:latest
     command: psql -f /bootstrap.sql
