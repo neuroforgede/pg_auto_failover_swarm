@@ -115,7 +115,7 @@ run_sql() {
     "$@"
 }
 
-case "${@}" in
+case "$1" in
 monitor)
   docker_create_db_directories
   create_monitor
@@ -132,7 +132,7 @@ db-server)
   setup_hba_node
   pg_autoctl_run
   ;;
-run-sql)
+psql)
   shift
   run_sql "$@"
   ;;
