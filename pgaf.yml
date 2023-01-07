@@ -119,7 +119,7 @@ services:
   # simple showcase how to get a psql shell to run bootstrap SQL code
   bootstrap:
     image: none.local/pgaf:latest
-    command: psql < /bootstrap.sql
+    command: psql -f /bootstrap.sql
     networks:
       pgaf:
     configs:
