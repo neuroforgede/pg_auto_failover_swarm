@@ -44,17 +44,17 @@ services:
       PGAF_NAME: node1.local
       PGAF_MONITOR_HOSTNAME: monitor.local
     secrets:
-      - source: node_1_ssl_ca
+      - source: postgres_ssl_ca
         target: ssl_ca
         uid: '999'
         gid: '999'
         mode: 0600
-      - source: node_1_ssl_cert
+      - source: postgres_ssl_cert
         target: ssl_cert
         uid: '999'
         gid: '999'
         mode: 0600
-      - source: node_1_ssl_key
+      - source: postgres_ssl_key
         target: ssl_key
         uid: '999'
         gid: '999'
@@ -75,17 +75,17 @@ services:
       PGAF_NAME: node2.local
       PGAF_MONITOR_HOSTNAME: monitor.local
     secrets:
-      - source: node_2_ssl_ca
+      - source: postgres_ssl_ca
         target: ssl_ca
         uid: '999'
         gid: '999'
         mode: 0600
-      - source: node_2_ssl_cert
+      - source: postgres_ssl_cert
         target: ssl_cert
         uid: '999'
         gid: '999'
         mode: 0600
-      - source: node_2_ssl_key
+      - source: postgres_ssl_key
         target: ssl_key
         uid: '999'
         gid: '999'
@@ -112,19 +112,12 @@ secrets:
   monitor_ssl_key:
     file: ./test/certs/monitor/postgres_server/server.key
 
-  node_1_ssl_ca:
-    file: ./test/certs/node_1/postgres_server/rootCA-verification.pem
-  node_1_ssl_cert:
-    file: ./test/certs/node_1/postgres_server/server.crt
-  node_1_ssl_key:
-    file: ./test/certs/node_1/postgres_server/server.key
-
-  node_2_ssl_ca:
-    file: ./test/certs/node_2/postgres_server/rootCA-verification.pem
-  node_2_ssl_cert:
-    file: ./test/certs/node_2/postgres_server/server.crt
-  node_2_ssl_key:
-    file: ./test/certs/node_2/postgres_server/server.key
+  postgres_ssl_ca:
+    file: ./test/certs/postgres/postgres_server/rootCA-verification.pem
+  postgres_ssl_cert:
+    file: ./test/certs/postgres/postgres_server/server.crt
+  postgres_ssl_key:
+    file: ./test/certs/postgres/postgres_server/server.key
 
 networks:
   pgaf:
