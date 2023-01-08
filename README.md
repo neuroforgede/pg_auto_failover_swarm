@@ -1,6 +1,6 @@
 # pg_auto_failover_swarm
 
-Work in progress. Don't use any of this in production yet!
+Work in progress. Don't use any of this in production (just) yet!
 
 This repository will contain all of the necessary things to have a pg_auto_failover cluster running in Docker Swarm.
 
