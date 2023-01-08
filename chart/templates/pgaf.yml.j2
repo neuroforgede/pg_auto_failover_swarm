@@ -1,7 +1,15 @@
 version: "3.8"
+
+x-postgres-volume: &postgres-node-volume
+  {{ postgres_node_volume_config }}
+
+x-monitor-volume: &monitor-node-volume
+  {{ monitor_node_volume_config }}
+
 services:
+
   monitor:
-    image: none.local/pgaf:latest
+    image: neuroforgede/pgaf-swarm:14.6
     command: monitor
     networks:
       pgaf:
@@ -32,7 +40,7 @@ services:
       - monitor:/var/lib/postgresql
   
   node_1:
-    image: none.local/pgaf:latest
+    image: neuroforgede/pgaf-swarm:14.6
     command: db-server
     networks:
       pgaf:
@@ -63,7 +71,7 @@ services:
       - node_1:/var/lib/postgresql
   
   node_2:
-    image: none.local/pgaf:latest
+    image: neuroforgede/pgaf-swarm:14.6
     command: db-server
     networks:
       pgaf:
@@ -94,7 +102,7 @@ services:
       - node_2:/var/lib/postgresql
 
   admin:
-    image: none.local/pgaf:latest
+    image: neuroforgede/pgaf-swarm:14.6
     entrypoint: /bin/bash -c 'tail -f /dev/null'
     command: []
     networks:
@@ -116,78 +124,40 @@ services:
         gid: '999'
         mode: 0600
 
-  # simple showcase how to get a psql shell to run bootstrap SQL code
-  # in prod, you probably dont want to run this on every deploy
-  bootstrap:
-    image: none.local/pgaf:latest
-    command: psql -f /bootstrap.sql
-    networks:
-      pgaf:
-    configs:
-      - source: bootstrap_sql
-        target: /bootstrap.sql
-        uid: '999'
-        gid: '999'
-        mode: 0600
-    secrets:
-      - source: admin_ssl_ca
-        target: ssl_ca
-        uid: '999'
-        gid: '999'
-        mode: 0600
-      - source: admin_ssl_cert
-        target: ssl_cert
-        uid: '999'
-        gid: '999'
-        mode: 0600
-      - source: admin_ssl_key
-        target: ssl_key
-        uid: '999'
-        gid: '999'
-        mode: 0600
-
-  # haproxy:
-  #   restart: unless-stopped
-  #   image: none.local/haproxy:latest
-  #   hostname: haproxy
-  #   volumes:
-  #     - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
-  #   ports:
-  #     - 4000:4000
-  #     - 5000:5000
-  #     - 5001:5001
-
 secrets:
   monitor_ssl_ca:
-    file: ./test/certs/monitor/postgres_server/rootCA-verification.pem
+    file: ./certs/monitor/postgres_server/rootCA-verification.pem
   monitor_ssl_cert:
-    file: ./test/certs/monitor/postgres_server/server.crt
+    file: ./certs/monitor/postgres_server/server.crt
   monitor_ssl_key:
-    file: ./test/certs/monitor/postgres_server/server.key
+    file: ./certs/monitor/postgres_server/server.key
 
   postgres_ssl_ca:
-    file: ./test/certs/postgres/postgres_server/rootCA-verification.pem
+    file: ./certs/postgres/postgres_server/rootCA-verification.pem
   postgres_ssl_cert:
-    file: ./test/certs/postgres/postgres_server/server.crt
+    file: ./certs/postgres/postgres_server/server.crt
   postgres_ssl_key:
-    file: ./test/certs/postgres/postgres_server/server.key
+    file: ./certs/postgres/postgres_server/server.key
 
   admin_ssl_ca:
-    file: ./test/certs/admin/postgres_server/rootCA-verification.pem
+    file: ./certs/admin/postgres_server/rootCA-verification.pem
   admin_ssl_cert:
-    file: ./test/certs/admin/postgres_server/server.crt
+    file: ./certs/admin/postgres_server/server.crt
   admin_ssl_key:
-    file: ./test/certs/admin/postgres_server/server.key
-
-configs:
-  bootstrap_sql:
-    file: ./bootstrap/bootstrap.sql
+    file: ./certs/admin/postgres_server/server.key
 
 networks:
   pgaf:
+    attachable: true
     driver: overlay
+    driver_opts:
+      encrypted: ""
+      com.docker.network.driver.mtu: "1350"
 
 volumes:
   node_1:
+    <<: *postgres-node-volume
   node_2:
+    <<: *postgres-node-volume
   monitor:
+    <<: *monitor-node-volume

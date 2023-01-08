@@ -14,8 +14,8 @@ RUN mkdir -p /etc/pgaf/
 RUN mkdir -p /etc/pgaf/config
 COPY config /etc/pgaf/config/
 
-COPY entrypoint.sh /usr/bin/entrypoint
-RUN chmod +x /usr/bin/entrypoint
+COPY pgaf.sh /usr/bin/pgaf
+RUN chmod +x /usr/bin/pgaf
 
 RUN mkdir -p /var/lib/postgresql/data
 RUN chown -R postgres:postgres /var/lib/postgresql
@@ -28,4 +28,4 @@ ENV PGAF_SSL_KEY /var/run/secrets/ssl_key
 ENV PGAF_SSL_MODE verify-ca
 
 USER root
-ENTRYPOINT ["entrypoint"]
+ENTRYPOINT ["pgaf"]
