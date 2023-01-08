@@ -30,5 +30,7 @@ ENV PGAF_SSL_CERT /var/run/secrets/ssl_cert
 ENV PGAF_SSL_KEY /var/run/secrets/ssl_key
 ENV PGAF_SSL_MODE verify-ca
 
+ENV PGDATA /var/lib/postgresql/data/cluster
+
 USER root
 ENTRYPOINT ["pgaf"]

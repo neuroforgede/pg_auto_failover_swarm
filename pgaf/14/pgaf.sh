@@ -18,7 +18,7 @@ check_result () {
 
 docker_setup_env() {
 	declare -g DATABASE_ALREADY_EXISTS
-	if [ -s "/var/lib/postgresql/.config/pg_autoctl/var/lib/postgresql/data/cluster/pg_autoctl.cfg" ]; then
+	if [ -s "/var/lib/postgresql/.config/pg_autoctl$PGDATA/pg_autoctl.cfg" ]; then
 		DATABASE_ALREADY_EXISTS='true'
     log "cluster is already initialized, skipping setup..."
 	fi
@@ -33,14 +33,14 @@ docker_create_db_directories() {
     local user
     user="$(id -u)"
 
-    mkdir -p "/var/lib/postgresql/data/cluster"
+    mkdir -p "$PGDATA"
 
     mkdir -p /var/lib/postgresql/.postgresql
     ln -s /var/run/secrets/ssl_key /var/lib/postgresql/.postgresql/postgresql.key
     ln -s /var/run/secrets/ssl_cert /var/lib/postgresql/.postgresql/postgresql.crt
     chown -R postgres:postgres /var/lib/postgresql/.postgresql
 
-    mkdir -p /var/lib/postgresql/data/cluster
+    mkdir -p $PGDATA
     chown -R postgres:postgres /var/lib/postgresql/data
 
     # ignore failure since it will be fine when using the image provided directory; see also https://github.com/docker-library/postgres/pull/289
@@ -52,8 +52,7 @@ docker_create_db_directories() {
 create_monitor() {
   if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
     log "creating data monitor..."
-    sudo -u postgres /usr/bin/pg_autoctl create monitor \
-      --pgdata /var/lib/postgresql/data/cluster \
+    sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl create monitor \
       --pgctl /usr/lib/postgresql/14/bin/pg_ctl \
       --hostname "${PGAF_HOSTNAME}" \
       --skip-pg-hba \
@@ -68,8 +67,7 @@ create_monitor() {
 create_postgres() {
   if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
     log "creating data node..."
-    sudo -u postgres /usr/bin/pg_autoctl create postgres \
-      --pgdata /var/lib/postgresql/data/cluster \
+    sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl create postgres \
       --monitor "postgres://autoctl_node@${PGAF_MONITOR_HOSTNAME}:5432/pg_auto_failover" \
       --hostname "${PGAF_HOSTNAME}" \
       --name "${PGAF_NAME}" \
@@ -80,47 +78,50 @@ create_postgres() {
       --server-key "$PGAF_SSL_KEY" \
       --ssl-mode "$PGAF_SSL_MODE"
     check_result "failed to create postgres"
-    # FIXME: check error codes
   fi
 }
 
 setup_pg_ident_conf() {
-  cp /etc/pgaf/config/pg_ident.conf /var/lib/postgresql/data/cluster/pg_ident.conf
-  check_result "failed to copy /etc/pgaf/config/pg_ident.conf to /var/lib/postgresql/data/cluster/pg_ident.conf"
+  cp /etc/pgaf/config/pg_ident.conf $PGDATA/pg_ident.conf
+  check_result "failed to copy /etc/pgaf/config/pg_ident.conf to $PGDATA/pg_ident.conf"
 }
 
 setup_postgresql_conf() {
-  cp /etc/pgaf/config/postgresql.custom.conf /var/lib/postgresql/data/cluster/postgresql.custom.conf
-  check_result "failed to copy /etc/pgaf/config/postgresql.custom.conf to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
-  chown postgres:postgres /var/lib/postgresql/data/cluster/postgresql.custom.conf
-  check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/postgresql.custom.conf"
+  cp /etc/pgaf/config/postgresql.custom.conf $PGDATA/postgresql.custom.conf
+  check_result "failed to copy /etc/pgaf/config/postgresql.custom.conf to $PGDATA/postgresql.custom.conf"
+  chown postgres:postgres $PGDATA/postgresql.custom.conf
+  check_result "failed to chown postgres:postgres to $PGDATA/postgresql.custom.conf"
   LINE="include 'postgresql.custom.conf'"
-  FILE="/var/lib/postgresql/data/cluster/postgresql.conf"
+  FILE="$PGDATA/postgresql.conf"
   grep -qF -- "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
   check_result "failed to append inclusion of custom config file to $FILE"
 }
 
 setup_hba_monitor() {
-  cp /etc/pgaf/config/pg_hba_monitor.conf /var/lib/postgresql/data/cluster/pg_hba.conf
-  check_result "failed to copy /etc/pgaf/config/pg_hba_monitor.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
-  chown postgres:postgres /var/lib/postgresql/data/cluster/pg_hba.conf
-  check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/pg_hba.conf"
+  cp /etc/pgaf/config/pg_hba_monitor.conf $PGDATA/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/config/pg_hba_monitor.conf to $PGDATA/pg_hba.conf"
+  chown postgres:postgres $PGDATA/pg_hba.conf
+  check_result "failed to chown postgres:postgres to $PGDATA/pg_hba.conf"
 }
 
 setup_hba_node() {
-  cp /etc/pgaf/config/pg_hba_node.conf /var/lib/postgresql/data/cluster/pg_hba.conf
-  check_result "failed to copy /etc/pgaf/config/pg_hba_node.conf to /var/lib/postgresql/data/cluster/pg_hba.conf"
-  chown postgres:postgres /var/lib/postgresql/data/cluster/pg_hba.conf
-  check_result "failed to chown postgres:postgres to /var/lib/postgresql/data/cluster/pg_hba.conf"
+  cp /etc/pgaf/config/pg_hba_node.conf $PGDATA/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/config/pg_hba_node.conf to $PGDATA/pg_hba.conf"
+  chown postgres:postgres $PGDATA/pg_hba.conf
+  check_result "failed to chown postgres:postgres to $PGDATA/pg_hba.conf"
 }
 
 pg_autoctl_run() {
   log "starting pg_autoctl..."
-  exec sudo -u postgres /usr/bin/pg_autoctl run --pgdata /var/lib/postgresql/data/cluster
+  exec sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl run
+}
+
+run_pg_autoctl() {
+  exec sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl "$@"
 }
 
 run_sql() {
-  exec sudo -u postgres psql \
+  exec sudo PGDATA=$PGDATA -u postgres psql \
     "host=$PGAF_NODE_LIST \
     user=postgres \
     sslkey=$PGAF_SSL_KEY \
@@ -153,6 +154,10 @@ db-server)
 psql)
   shift
   run_sql "$@"
+  ;;
+pg_autoctl)
+  shift
+  run_pg_autoctl "$@"
   ;;
 *)
   error "command '${@}' not supported"
