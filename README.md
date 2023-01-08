@@ -23,6 +23,7 @@ on simplicity.
 export BASE_DIR="."
 export WORKDIR=test
 export CHART_DIR="../chart"
+export START_PWD=$(pwd)
 
 mkdir -p $WORKDIR/overrides/templates
 
@@ -57,8 +58,6 @@ bash recreate_server_certs.sh
 ## Run deployment
 
 ```bash
-export WORKDIR=test
-
-cd $WORKDIR
+cd $START_PWD
 bash setup.sh
 ```
