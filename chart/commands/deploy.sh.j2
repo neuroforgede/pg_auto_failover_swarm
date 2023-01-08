@@ -1,2 +1,9 @@
 #!/bin/bash
-docker-sdp stack deploy -c pgaf.yml {{ stack_name }}
+
+{% if prune_services %}
+COMMAND_SUFFIX="--prune"
+{% else %}
+COMMAND_SUFFIX=""
+{% endif %}
+
+docker-sdp stack deploy -c pgaf.yml {{ stack_name }} $COMMAND_SUFFIX

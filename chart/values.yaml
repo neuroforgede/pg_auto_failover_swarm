@@ -1,0 +1,9 @@
+postgres_node_count: 2
+
+# whether to prune services that do not take part anymore
+# this is does not automatically remove the nodes from the
+# pg_auto_failover cluster
+prune_services: false
+
+postgres_node_volume_config: {}
+monitor_node_volume_config: {}
