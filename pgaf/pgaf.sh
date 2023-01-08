@@ -21,8 +21,6 @@ docker_setup_env() {
 	if [ -s "/var/lib/postgresql/.config/pg_autoctl/var/lib/postgresql/data/cluster/pg_autoctl.cfg" ]; then
 		DATABASE_ALREADY_EXISTS='true'
     log "cluster is already initialized, skipping setup..."
-  else
-    ls -la /var/lib/postgresql/data/cluster
 	fi
 }
 

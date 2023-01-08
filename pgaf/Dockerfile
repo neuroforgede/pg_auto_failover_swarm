@@ -1,4 +1,7 @@
-FROM postgres:14.6
+FROM postgres:14.6 as build
+# kill all settings on the postgres image
+FROM scratch
+COPY --from=build / /
 
 RUN apt-get update && apt-get install -y curl && \
   curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
