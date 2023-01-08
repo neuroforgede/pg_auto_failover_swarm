@@ -1,10 +1,10 @@
 version: "3.8"
 
 x-postgres-volume: &postgres-node-volume
-  {{ postgres_node_volume_config }}
+  {{ postgres_node_volume_config | default({}) }}
 
 x-monitor-volume: &monitor-node-volume
-  {{ monitor_node_volume_config }}
+  {{ monitor_node_volume_config | default({}) }}
 
 services:
 
