@@ -1,5 +1,7 @@
 # pg_auto_failover_swarm
 
+![](https://img.shields.io/docker/pulls/neuroforgede/pgaf-swarm.svg)
+
 Work in progress. Don't use any of this in production (just) yet!
 
 This repository will contain all of the necessary things to have a pg_auto_failover cluster running in Docker Swarm.
