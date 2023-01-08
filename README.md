@@ -61,3 +61,12 @@ bash recreate_server_certs.sh
 cd $START_PWD
 bash setup.sh
 ```
+
+# Run pg_autoctl commands
+
+To run `pg_autoctl` commands inside the container, simply prefix the command you want to run with `pgaf`.
+### Example: `show state`
+
+To show the state, exec into one of the nodes and run `pgaf pg_autoctl show state`
+
+![](./images/show_state.png)
