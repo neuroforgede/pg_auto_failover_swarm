@@ -105,6 +105,8 @@ services:
     image: neuroforgede/pgaf-swarm:14.6
     entrypoint: /bin/bash -c 'tail -f /dev/null'
     command: []
+    environment:
+      PGAF_NODE_LIST: node1.local,node2.local
     networks:
       pgaf:
     secrets:

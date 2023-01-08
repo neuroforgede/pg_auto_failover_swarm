@@ -125,7 +125,7 @@ pg_autoctl_run() {
 
 run_sql() {
   exec sudo -u postgres psql \
-    "host=node1.local,node2.local \
+    "host=$PGAF_NODE_LIST \
     user=postgres \
     sslkey=$PGAF_SSL_KEY \
     sslcert=$PGAF_SSL_CERT \
