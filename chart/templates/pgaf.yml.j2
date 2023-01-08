@@ -38,18 +38,19 @@ services:
         mode: 0600
     volumes:
       - monitor:/var/lib/postgresql
-  
-  node_1:
+
+{% for postgres_node_idx in range(postgres_node_count) %}
+  node_{{ postgres_node_idx }}:
     image: neuroforgede/pgaf-swarm:14.6
     command: db-server
     networks:
       pgaf:
         aliases:
-          - node1.local
+          - node{{ postgres_node_idx }}.local
     environment:
       PGAF_SSL_MODE: verify-ca
-      PGAF_HOSTNAME: node1.local
-      PGAF_NAME: node1.local
+      PGAF_HOSTNAME: node{{ postgres_node_idx }}.local
+      PGAF_NAME: node{{ postgres_node_idx }}.local
       PGAF_MONITOR_HOSTNAME: monitor.local
     secrets:
       - source: postgres_ssl_ca
@@ -68,45 +69,18 @@ services:
         gid: '999'
         mode: 0600
     volumes:
-      - node_1:/var/lib/postgresql
-  
-  node_2:
-    image: neuroforgede/pgaf-swarm:14.6
-    command: db-server
-    networks:
-      pgaf:
-        aliases:
-          - node2.local
-    environment:
-      PGAF_SSL_MODE: verify-ca
-      PGAF_HOSTNAME: node2.local
-      PGAF_NAME: node2.local
-      PGAF_MONITOR_HOSTNAME: monitor.local
-    secrets:
-      - source: postgres_ssl_ca
-        target: ssl_ca
-        uid: '999'
-        gid: '999'
-        mode: 0600
-      - source: postgres_ssl_cert
-        target: ssl_cert
-        uid: '999'
-        gid: '999'
-        mode: 0600
-      - source: postgres_ssl_key
-        target: ssl_key
-        uid: '999'
-        gid: '999'
-        mode: 0600
-    volumes:
-      - node_2:/var/lib/postgresql
+      - node_{{ postgres_node_idx }}:/var/lib/postgresql
+{% endfor %}
 
   admin:
     image: neuroforgede/pgaf-swarm:14.6
     entrypoint: /bin/bash -c 'tail -f /dev/null'
     command: []
     environment:
-      PGAF_NODE_LIST: node1.local,node2.local
+      PGAF_NODE_LIST: >
+{% for idx in range(postgres_node_count) %}
+        node{{idx}}.local
+{% endfor %}
     networks:
       pgaf:
     secrets:
@@ -157,9 +131,9 @@ networks:
       com.docker.network.driver.mtu: "1350"
 
 volumes:
-  node_1:
+{% for postgres_node_idx in range(postgres_node_count) %}
+  node_{{ postgres_node_idx }}:
     <<: *postgres-node-volume
-  node_2:
-    <<: *postgres-node-volume
+{% endfor %}
   monitor:
     <<: *monitor-node-volume

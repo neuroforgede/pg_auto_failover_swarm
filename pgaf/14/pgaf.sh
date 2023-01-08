@@ -52,7 +52,6 @@ docker_create_db_directories() {
 create_monitor() {
   if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
     log "creating data monitor..."
-    # FIXME: check if already initialized
     sudo -u postgres /usr/bin/pg_autoctl create monitor \
       --pgdata /var/lib/postgresql/data/cluster \
       --pgctl /usr/lib/postgresql/14/bin/pg_ctl \
@@ -63,15 +62,12 @@ create_monitor() {
       --server-key "$PGAF_SSL_KEY" \
       --ssl-mode "$PGAF_SSL_MODE"
     check_result "failed to create monitor"
-    # FIXME: check error codes
   fi
 }
 
 create_postgres() {
   if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
     log "creating data node..."
-    # FIXME: check if already initialized
-    # TODO: make monitor url configurable
     sudo -u postgres /usr/bin/pg_autoctl create postgres \
       --pgdata /var/lib/postgresql/data/cluster \
       --monitor "postgres://autoctl_node@${PGAF_MONITOR_HOSTNAME}:5432/pg_auto_failover" \
