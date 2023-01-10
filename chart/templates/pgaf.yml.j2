@@ -20,6 +20,22 @@ services:
       PGAF_HOSTNAME: monitor.local
       PGAF_NAME: monitor.local
       PGAF_MONITOR_HOSTNAME: monitor.local
+    configs:
+      - source: pg_hba_monitor
+        target: /etc/pgaf/pg_hba.conf
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: pg_ident_monitor
+        target: /etc/pgaf/pg_ident.conf
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: postgresql_monitor_custom
+        target: /etc/pgaf/postgresql.custom.conf
+        uid: '999'
+        gid: '999'
+        mode: 0600
     secrets:
       - source: monitor_ssl_ca
         target: ssl_ca
@@ -52,6 +68,22 @@ services:
       PGAF_HOSTNAME: node{{ postgres_node_idx }}.local
       PGAF_NAME: node{{ postgres_node_idx }}.local
       PGAF_MONITOR_HOSTNAME: monitor.local
+    configs:
+      - source: pg_hba_node
+        target: /etc/pgaf/pg_hba.conf
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: pg_ident_node
+        target: /etc/pgaf/pg_ident.conf
+        uid: '999'
+        gid: '999'
+        mode: 0600
+      - source: postgresql_node_custom
+        target: /etc/pgaf/postgresql.custom.conf
+        uid: '999'
+        gid: '999'
+        mode: 0600
     secrets:
       - source: postgres_ssl_ca
         target: ssl_ca
@@ -99,6 +131,22 @@ services:
         uid: '999'
         gid: '999'
         mode: 0600
+
+configs:
+  pg_hba_monitor:
+    file: ./configs/monitor/pg_hba.conf
+  postgresql_monitor_custom:
+    file: ./configs/monitor/postgresql.custom.conf
+  pg_ident_monitor:
+    file: ./configs/monitor/pg_ident.conf
+
+  pg_hba_node:
+    file: ./configs/node/pg_hba.conf
+  postgresql_node_custom:
+    file: ./configs/node/postgresql.custom.conf
+  pg_ident_node:
+    file: ./configs/node/pg_ident.conf
+
 
 secrets:
   monitor_ssl_ca:

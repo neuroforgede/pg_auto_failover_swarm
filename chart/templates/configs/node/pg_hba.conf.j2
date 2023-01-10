@@ -24,3 +24,5 @@ hostssl pg_auto_failover autoctl_node all cert map=autoctl_node_remote
 
 hostssl postgres pgautofailover_replicator all cert map=pgautofailover_replicator_remote
 hostssl replication pgautofailover_replicator all cert map=pgautofailover_replicator_remote
+
+{{ pg_hba_conf_node | default('') }}

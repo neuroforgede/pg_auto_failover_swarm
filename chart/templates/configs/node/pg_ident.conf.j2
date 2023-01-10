@@ -1,0 +1,18 @@
+# map-name system-username database-username
+autoctl_node_peer  postgres             autoctl_node
+
+postgres_node_remote monitor postgres
+autoctl_node_remote monitor autoctl_node
+pgautofailover_replicator_remote monitor pgautofailover_replicator
+pgautofailover_monitor_remote monitor pgautofailover_monitor
+
+postgres_node_remote postgres postgres
+autoctl_node_remote postgres autoctl_node
+pgautofailover_replicator_remote postgres pgautofailover_replicator
+pgautofailover_monitor_remote postgres pgautofailover_monitor
+
+# maps the admin certificate to the postgres user
+# so we can do the bootstrapping from there
+admin_cert admin postgres
+
+{{ pg_ident_conf_node | default('') }}

@@ -97,16 +97,9 @@ setup_postgresql_conf() {
   check_result "failed to append inclusion of custom config file to $FILE"
 }
 
-setup_hba_monitor() {
-  cp /etc/pgaf/config/pg_hba_monitor.conf $PGDATA/pg_hba.conf
-  check_result "failed to copy /etc/pgaf/config/pg_hba_monitor.conf to $PGDATA/pg_hba.conf"
-  chown postgres:postgres $PGDATA/pg_hba.conf
-  check_result "failed to chown postgres:postgres to $PGDATA/pg_hba.conf"
-}
-
-setup_hba_node() {
-  cp /etc/pgaf/config/pg_hba_node.conf $PGDATA/pg_hba.conf
-  check_result "failed to copy /etc/pgaf/config/pg_hba_node.conf to $PGDATA/pg_hba.conf"
+setup_hba() {
+  cp /etc/pgaf/config/pg_hba.conf $PGDATA/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/config/pg_hba.conf to $PGDATA/pg_hba.conf"
   chown postgres:postgres $PGDATA/pg_hba.conf
   check_result "failed to chown postgres:postgres to $PGDATA/pg_hba.conf"
 }
@@ -139,7 +132,7 @@ monitor)
   create_monitor
   setup_pg_ident_conf
   setup_postgresql_conf
-  setup_hba_monitor
+  setup_hba
   pg_autoctl_run
   ;;
 db-server)
@@ -148,7 +141,7 @@ db-server)
   create_postgres
   setup_pg_ident_conf
   setup_postgresql_conf
-  setup_hba_node
+  setup_hba
   pg_autoctl_run
   ;;
 psql)

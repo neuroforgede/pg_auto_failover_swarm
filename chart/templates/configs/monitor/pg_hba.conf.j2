@@ -1,0 +1,28 @@
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+local   replication     all                                     trust
+
+# TODO: these or the ones above?
+local all postgres    peer
+local replication postgres    peer
+
+hostssl all postgres all cert map=admin_cert
+
+hostssl postgres postgres all cert map=postgres_node_remote
+hostssl postgres pgautofailover_monitor all cert map=pgautofailover_monitor_remote
+
+hostssl template1 postgres all cert map=postgres_node_remote
+hostssl template1 autoctl_node all cert map=autoctl_node_remote
+
+hostssl autoctl autoctl_node all cert map=autoctl_node_remote
+
+hostssl pg_auto_failover autoctl_node all cert map=autoctl_node_remote
+
+hostssl postgres pgautofailover_replicator all cert map=pgautofailover_replicator_remote
+hostssl replication pgautofailover_replicator all cert map=pgautofailover_replicator_remote
+
+{{ pg_hba_conf_monitor | default('') }}
