@@ -67,7 +67,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: |
-            suffix=-14.6
+            suffix=-14
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
