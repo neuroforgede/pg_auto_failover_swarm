@@ -41,6 +41,7 @@ postgres_nodes:
     hostname: "node1.local"
     # this is the default, but can be overridden
     pgdata: "/var/lib/postgresql/data"
+    placement: {}
     # this is the default, but can be overridden
     volume_mount: "/var/lib/postgresql"
     volume_config: {}
@@ -56,6 +57,7 @@ postgres_nodes:
     hostname: "node2.local"
     # this is the default, but can be overridden
     pgdata: "/var/lib/postgresql/data"
+    placement: {}
     # this is the default, but can be overridden
     volume_mount: "/var/lib/postgresql"
     volume_config: {}
