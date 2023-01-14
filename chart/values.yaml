@@ -10,7 +10,6 @@ monitor_node_hostname: "monitor.local"
 postgres_node_volume_config: {}
 monitor_node_volume_config: {}
 
-postgres_node_pgdata: /var/lib/postgresql/data
 monitor_node_pgdata: /var/lib/postgresql/data
 
 monitor_node_volume_mount: /var/lib/postgresql
