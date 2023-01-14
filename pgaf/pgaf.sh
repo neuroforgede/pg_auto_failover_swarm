@@ -52,7 +52,7 @@ docker_create_db_directories() {
 create_monitor() {
   if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
     log "creating data monitor..."
-    sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl create monitor \
+    sudo PGDATA=$PGDATA -u postgres /usr/local/bin/pg_autoctl create monitor \
       --pgctl /usr/lib/postgresql/$POSTGRES_MAJOR_VERSION/bin/pg_ctl \
       --hostname "${PGAF_HOSTNAME}" \
       --skip-pg-hba \
@@ -67,7 +67,7 @@ create_monitor() {
 create_postgres() {
   if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
     log "creating data node..."
-    sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl create postgres \
+    sudo PGDATA=$PGDATA -u postgres /usr/local/bin/pg_autoctl create postgres \
       --monitor "postgres://autoctl_node@${PGAF_monitor_node_hostname}:5432/pg_auto_failover" \
       --hostname "${PGAF_HOSTNAME}" \
       --name "${PGAF_NAME}" \
@@ -106,11 +106,11 @@ setup_hba() {
 
 pg_autoctl_run() {
   log "starting pg_autoctl..."
-  exec sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl run
+  exec sudo PGDATA=$PGDATA -u postgres /usr/local/bin/pg_autoctl run
 }
 
 run_pg_autoctl() {
-  exec sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl "$@"
+  exec sudo PGDATA=$PGDATA -u postgres /usr/local/bin/pg_autoctl "$@"
 }
 
 run_sql() {

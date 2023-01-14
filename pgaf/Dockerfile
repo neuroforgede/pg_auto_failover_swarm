@@ -1,21 +1,48 @@
 ARG POSTGRES_VERSION
-FROM postgres:$POSTGRES_VERSION as build
+FROM postgres:$POSTGRES_VERSION as pg_base
+
+FROM pg_base as pgaf_build
+ARG POSTGRES_VERSION
+ARG POSTGRES_MAJOR_VERSION
+ARG PG_AUTO_FAILOVER_VERSION=2.0
+
+ENV PG_CONFIG /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/pg_config
+
+RUN apt-get update && apt-get install -y \
+  curl \
+  gcc \
+  make \
+  postgresql-server-dev-${POSTGRES_MAJOR_VERSION} \
+  libkrb5-dev \
+  libselinux1-dev \
+  libxslt1-dev \
+  libzstd-dev \
+  liblz4-dev \
+  libpam-dev \
+  libreadline-dev \
+  zlib1g-dev
+
+RUN mkdir -p /build && \
+  curl -L https://github.com/citusdata/pg_auto_failover/archive/refs/tags/v${PG_AUTO_FAILOVER_VERSION}.tar.gz -o /build/pgaf.tar.gz && \
+  cd /build && tar -xvf pgaf.tar.gz && \
+  cd /build/pg_auto_failover-${PG_AUTO_FAILOVER_VERSION} && \
+  make -s clean && make -s install -j8
+
 # kill all settings on the postgres image
 FROM scratch
+ARG PG_AUTO_FAILOVER_VERSION=2.0
 ARG POSTGRES_VERSION
 ARG POSTGRES_MAJOR_VERSION
 ENV POSTGRES_MAJOR_VERSION=$POSTGRES_MAJOR_VERSION
-COPY --from=build / /
+COPY --from=pg_base / /
 
-RUN apt-get update && apt-get install -y curl && \
-  curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
-  echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/pgautofailover.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
+COPY --from=pgaf_build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/pgautofailover* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
+COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/pg_autoctl /usr/local/bin
 
-# FIXME: install a specific version!
 RUN apt-get update && apt-get install -y \
-  pg-auto-failover-cli \
-  postgresql-$POSTGRES_MAJOR_VERSION-auto-failover \
-  sudo
+  sudo \
+  libncurses6 
 
 RUN mkdir -p /etc/pgaf/
 RUN mkdir -p /etc/pgaf/config
