@@ -3,6 +3,7 @@ FROM postgres:$POSTGRES_VERSION as build
 # kill all settings on the postgres image
 FROM scratch
 ARG POSTGRES_VERSION
+ARG POSTGRES_MAJOR_VERSION
 COPY --from=build / /
 
 RUN apt-get update && apt-get install -y curl && \
@@ -12,7 +13,7 @@ RUN apt-get update && apt-get install -y curl && \
 # FIXME: install a specific version!
 RUN apt-get update && apt-get install -y \
   pg-auto-failover-cli \
-  postgresql-$POSTGRES_VERSION-auto-failover \
+  postgresql-$POSTGRES_MAJOR_VERSION-auto-failover \
   sudo
 
 RUN mkdir -p /etc/pgaf/
