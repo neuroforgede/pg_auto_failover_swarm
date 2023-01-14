@@ -2,6 +2,7 @@ ARG POSTGRES_VERSION
 FROM postgres:$POSTGRES_VERSION as build
 # kill all settings on the postgres image
 FROM scratch
+ARG POSTGRES_VERSION
 COPY --from=build / /
 
 RUN apt-get update && apt-get install -y curl && \
