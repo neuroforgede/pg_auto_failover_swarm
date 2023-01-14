@@ -30,6 +30,7 @@ jobs:
             - "14"
             - "14.6"
             - "15"
+            - "15.1"
 
     runs-on: ubuntu-latest
     permissions:
