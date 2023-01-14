@@ -68,7 +68,7 @@ postgres_nodes:
     #     gid: "999"
 
 # this is the default, but can be overridden
-monitor_hostname: "monitor.local"
+monitor_node_hostname: "monitor.local"
 
 monitor_node_volume_config: {}
   # driver: hetzner-volume

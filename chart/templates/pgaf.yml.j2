@@ -12,19 +12,20 @@ services:
 
   monitor:
     image: ghcr.io/neuroforgede/pgaf-swarm:{{ pgaf_swarm_version }}
-    #command: monitor
-    command: []
-    entrypoint: "tail -f /dev/null"
+    command: monitor
     networks:
       pgaf:
         aliases:
-          - "{{ monitor_hostname }}"
+          - "{{ monitor_node_hostname }}"
     environment:
       PGAF_SSL_MODE: verify-ca
-      PGAF_HOSTNAME: "{{ monitor_hostname }}"
-      PGAF_NAME: "{{ monitor_hostname }}"
-      PGAF_MONITOR_HOSTNAME: "{{ monitor_hostname }}"
+      PGAF_HOSTNAME: "{{ monitor_node_hostname }}"
+      PGAF_NAME: "{{ monitor_node_hostname }}"
+      PGAF_monitor_node_hostname: "{{ monitor_node_hostname }}"
       PGDATA: "{{ monitor_node_pgdata | default('/var/lib/postgresql/data') }}"
+    deploy:    
+      placement:
+        {{ monitor_node_placement | default({}) }}
     configs:
       - source: pg_hba_monitor
         target: /etc/pgaf/pg_hba.conf
@@ -72,8 +73,11 @@ services:
       PGAF_SSL_MODE: verify-ca
       PGAF_HOSTNAME: {{ postgres_node.hostname }}
       PGAF_NAME: {{ postgres_node.hostname }}
-      PGAF_MONITOR_HOSTNAME: "{{ monitor_hostname }}"
+      PGAF_monitor_node_hostname: "{{ monitor_node_hostname }}"
       PGDATA: "{{ postgres_node.pgdata | default('/var/lib/postgresql/data') }}"
+    deploy:    
+      placement:
+        {{ postgres_node.placement | default({}) }}
     configs:
       - source: pg_hba_node
         target: /etc/pgaf/pg_hba.conf

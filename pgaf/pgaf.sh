@@ -68,7 +68,7 @@ create_postgres() {
   if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
     log "creating data node..."
     sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl create postgres \
-      --monitor "postgres://autoctl_node@${PGAF_MONITOR_HOSTNAME}:5432/pg_auto_failover" \
+      --monitor "postgres://autoctl_node@${PGAF_monitor_node_hostname}:5432/pg_auto_failover" \
       --hostname "${PGAF_HOSTNAME}" \
       --name "${PGAF_NAME}" \
       --pgctl /usr/lib/postgresql/14/bin/pg_ctl \
