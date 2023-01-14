@@ -81,3 +81,5 @@ jobs:
             POSTGRES_MAJOR_VERSION=${{ matrix.version.postgres_major }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          flavor: |
+            latest=false
