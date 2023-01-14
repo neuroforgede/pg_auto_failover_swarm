@@ -4,6 +4,7 @@ FROM postgres:$POSTGRES_VERSION as build
 FROM scratch
 ARG POSTGRES_VERSION
 ARG POSTGRES_MAJOR_VERSION
+ENV POSTGRES_MAJOR_VERSION=$POSTGRES_MAJOR_VERSION
 COPY --from=build / /
 
 RUN apt-get update && apt-get install -y curl && \

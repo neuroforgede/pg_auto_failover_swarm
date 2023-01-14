@@ -53,7 +53,7 @@ create_monitor() {
   if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
     log "creating data monitor..."
     sudo PGDATA=$PGDATA -u postgres /usr/bin/pg_autoctl create monitor \
-      --pgctl /usr/lib/postgresql/14/bin/pg_ctl \
+      --pgctl /usr/lib/postgresql/$POSTGRES_MAJOR_VERSION/bin/pg_ctl \
       --hostname "${PGAF_HOSTNAME}" \
       --skip-pg-hba \
       --ssl-ca-file "$PGAF_SSL_CA" \
@@ -71,7 +71,7 @@ create_postgres() {
       --monitor "postgres://autoctl_node@${PGAF_monitor_node_hostname}:5432/pg_auto_failover" \
       --hostname "${PGAF_HOSTNAME}" \
       --name "${PGAF_NAME}" \
-      --pgctl /usr/lib/postgresql/14/bin/pg_ctl \
+      --pgctl /usr/lib/postgresql/$POSTGRES_MAJOR_VERSION/bin/pg_ctl \
       --skip-pg-hba \
       --ssl-ca-file "$PGAF_SSL_CA" \
       --server-cert "$PGAF_SSL_CERT" \
