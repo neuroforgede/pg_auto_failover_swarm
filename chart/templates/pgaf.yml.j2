@@ -1,7 +1,9 @@
 version: "3.8"
 
-x-postgres-volume: &postgres-node-volume
-  {{ postgres_node_volume_config | default({}) }}
+{% for postgres_node in postgres_nodes %}
+x-postgres-volume-{{ postgres_node.name }}: &postgres-node-volume-{{ postgres_node.name }}
+  {{ postgres_node.volume_config | default({}) }}
+{% endfor %}
 
 x-monitor-volume: &monitor-node-volume
   {{ monitor_node_volume_config | default({}) }}
@@ -10,16 +12,19 @@ services:
 
   monitor:
     image: ghcr.io/neuroforgede/pgaf-swarm:{{ pgaf_swarm_version }}
-    command: monitor
+    #command: monitor
+    command: []
+    entrypoint: "tail -f /dev/null"
     networks:
       pgaf:
         aliases:
-          - monitor.local
+          - "{{ monitor_hostname }}"
     environment:
       PGAF_SSL_MODE: verify-ca
-      PGAF_HOSTNAME: monitor.local
-      PGAF_NAME: monitor.local
-      PGAF_MONITOR_HOSTNAME: monitor.local
+      PGAF_HOSTNAME: "{{ monitor_hostname }}"
+      PGAF_NAME: "{{ monitor_hostname }}"
+      PGAF_MONITOR_HOSTNAME: "{{ monitor_hostname }}"
+      PGDATA: "{{ monitor_node_pgdata | default('/var/lib/postgresql/data') }}"
     configs:
       - source: pg_hba_monitor
         target: /etc/pgaf/pg_hba.conf
@@ -53,21 +58,22 @@ services:
         gid: '999'
         mode: 0600
     volumes:
-      - monitor:/var/lib/postgresql
+      - "monitor:{{ monitor_node_volume_mount }}"
 
-{% for postgres_node_idx in range(postgres_node_count) %}
-  node_{{ postgres_node_idx }}:
-    image: ghcr.io/neuroforgede/pgaf-swarm:0.1.2-14
+{% for postgres_node in postgres_nodes %}
+  {{ postgres_node.name }}:
+    image: ghcr.io/neuroforgede/pgaf-swarm:{{ pgaf_swarm_version }}
     command: db-server
     networks:
       pgaf:
         aliases:
-          - node{{ postgres_node_idx }}.local
+          - {{ postgres_node.hostname }}
     environment:
       PGAF_SSL_MODE: verify-ca
-      PGAF_HOSTNAME: node{{ postgres_node_idx }}.local
-      PGAF_NAME: node{{ postgres_node_idx }}.local
-      PGAF_MONITOR_HOSTNAME: monitor.local
+      PGAF_HOSTNAME: {{ postgres_node.hostname }}
+      PGAF_NAME: {{ postgres_node.hostname }}
+      PGAF_MONITOR_HOSTNAME: "{{ monitor_hostname }}"
+      PGDATA: "{{ postgres_node.pgdata | default('/var/lib/postgresql/data') }}"
     configs:
       - source: pg_hba_node
         target: /etc/pgaf/pg_hba.conf
@@ -101,17 +107,17 @@ services:
         gid: '999'
         mode: 0600
     volumes:
-      - node_{{ postgres_node_idx }}:/var/lib/postgresql
+      - "vol_{{ postgres_node.name }}:{{ postgres_node.volume_mount | default('/var/lib/postgresql') }}"
 {% endfor %}
 
   admin:
-    image: ghcr.io/neuroforgede/pgaf-swarm:0.1.2-14
+    image: ghcr.io/neuroforgede/pgaf-swarm:{{ pgaf_swarm_version }}
     entrypoint: /bin/bash -c 'tail -f /dev/null'
     command: []
     environment:
       PGAF_NODE_LIST: >
-{% for idx in range(postgres_node_count) %}
-        node{{idx}}.local
+{% for postgres_node in postgres_nodes %}
+        {{ postgres_node.hostname }}
 {% endfor %}
     networks:
       pgaf:
@@ -179,9 +185,10 @@ networks:
       com.docker.network.driver.mtu: "1350"
 
 volumes:
-{% for postgres_node_idx in range(postgres_node_count) %}
-  node_{{ postgres_node_idx }}:
-    <<: *postgres-node-volume
+{% for postgres_node in postgres_nodes %}
+  vol_{{ postgres_node.name }}:
+    # for any overrides we also merge the node specific config
+    <<: *postgres-node-volume-{{ postgres_node.name }}
 {% endfor %}
   monitor:
     <<: *monitor-node-volume

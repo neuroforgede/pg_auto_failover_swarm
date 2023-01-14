@@ -41,7 +41,7 @@ docker_create_db_directories() {
     chown -R postgres:postgres /var/lib/postgresql/.postgresql
 
     mkdir -p $PGDATA
-    chown -R postgres:postgres /var/lib/postgresql/data
+    chown -R postgres:postgres /var/lib/postgresql/$PGDATA
 
     # ignore failure since it will be fine when using the image provided directory; see also https://github.com/docker-library/postgres/pull/289
     mkdir -p /var/run/postgresql || :

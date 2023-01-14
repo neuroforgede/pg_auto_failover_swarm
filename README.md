@@ -23,7 +23,7 @@ on simplicity.
 
 ```bash
 export BASE_DIR="."
-export WORKDIR=test
+export WORKDIR="$(pwd)/test"
 export CHART_DIR="../chart"
 export START_PWD=$(pwd)
 
@@ -36,21 +36,53 @@ stack_name: "pgaf_test"
 
 pgaf_swarm_version: "0.1.2-14"
 
-postgres_node_volume_config: {}
+postgres_nodes:
+  - name: "node_1"
+    hostname: "node1.local"
+    # this is the default, but can be overridden
+    pgdata: "/var/lib/postgresql/data"
+    # this is the default, but can be overridden
+    volume_mount: "/var/lib/postgresql"
+    volume_config: {}
+    #   name: "node_1"
+    #   driver: hetzner-volume
+    #   driver_opts:
+    #     size: '10'
+    #     fstype: ext4
+    #     uid: "999"
+    #     gid: "999"
+
+  - name: "node_2"
+    hostname: "node2.local"
+    # this is the default, but can be overridden
+    pgdata: "/var/lib/postgresql/data"
+    # this is the default, but can be overridden
+    volume_mount: "/var/lib/postgresql"
+    volume_config: {}
+    #   name: "node_2"
+    #   driver: hetzner-volume
+    #   driver_opts:
+    #     size: '10'
+    #     fstype: ext4
+    #     uid: "999"
+    #     gid: "999"
+
+# this is the default, but can be overridden
+monitor_hostname: "monitor.local"
+
+monitor_node_volume_config: {}
   # driver: hetzner-volume
   # driver_opts:
+  #   name: "monitor"
   #   size: '10'
   #   fstype: ext4
   #   uid: "999"
   #   gid: "999"
 
-monitor_node_volume_config: {}
-  # driver: hetzner-volume
-  # driver_opts:
-  #   size: '10'
-  #   fstype: ext4
-  #   uid: "999"
-  #   gid: "999"
+# this is the default, but can be overridden
+monitor_node_pgdata: "/var/lib/postgresql/data"
+monitor_node_volume_mount: /var/lib/postgresql
+
 EOF
 
 cp -r "$BASE_DIR/certificates" "$WORKDIR/overrides/templates/certs"
@@ -62,7 +94,7 @@ bash recreate_server_certs.sh
 ## Run deployment
 
 ```bash
-cd $START_PWD
+cd $WORKDIR
 bash setup.sh
 ```
 
