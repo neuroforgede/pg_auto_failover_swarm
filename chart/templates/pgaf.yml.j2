@@ -9,7 +9,7 @@ x-monitor-volume: &monitor-node-volume
 services:
 
   monitor:
-    image: ghcr.io/neuroforgede/pgaf-swarm:0.1.2-14
+    image: ghcr.io/neuroforgede/pgaf-swarm:{{ pgaf_swarm_version }}
     command: monitor
     networks:
       pgaf:
