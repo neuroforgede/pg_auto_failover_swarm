@@ -1,4 +1,5 @@
-FROM postgres:14.6 as build
+ARG POSTGRES_VERSION
+FROM postgres:$POSTGRES_VERSION as build
 # kill all settings on the postgres image
 FROM scratch
 COPY --from=build / /
@@ -10,7 +11,7 @@ RUN apt-get update && apt-get install -y curl && \
 # FIXME: install a specific version!
 RUN apt-get update && apt-get install -y \
   pg-auto-failover-cli \
-  postgresql-14-auto-failover \
+  postgresql-$POSTGRES_VERSION-auto-failover \
   sudo
 
 RUN mkdir -p /etc/pgaf/
