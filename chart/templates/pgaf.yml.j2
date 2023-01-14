@@ -11,7 +11,7 @@ x-monitor-volume: &monitor-node-volume
 services:
 
   monitor:
-    image: ghcr.io/neuroforgede/pgaf-swarm:{{ pgaf_swarm_version }}
+    image: {{ pgaf_swarm_image }}{{ pgaf_swarm_version }}
     command: monitor
     networks:
       pgaf:
@@ -63,7 +63,7 @@ services:
 
 {% for postgres_node in postgres_nodes %}
   {{ postgres_node.name }}:
-    image: ghcr.io/neuroforgede/pgaf-swarm:{{ pgaf_swarm_version }}
+    image: {{ pgaf_swarm_image }}{{ pgaf_swarm_version }}
     command: db-server
     networks:
       pgaf:
@@ -115,7 +115,7 @@ services:
 {% endfor %}
 
   admin:
-    image: ghcr.io/neuroforgede/pgaf-swarm:{{ pgaf_swarm_version }}
+    image: {{ pgaf_swarm_image }}{{ pgaf_swarm_version }}
     entrypoint: /bin/bash -c 'tail -f /dev/null'
     command: []
     environment:

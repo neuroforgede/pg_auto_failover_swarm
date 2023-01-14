@@ -13,3 +13,5 @@ monitor_node_volume_config: {}
 monitor_node_pgdata: /var/lib/postgresql/data
 
 monitor_node_volume_mount: /var/lib/postgresql
+
+pgaf_swarm_image: ghcr.io/neuroforgede/pgaf-swarm
