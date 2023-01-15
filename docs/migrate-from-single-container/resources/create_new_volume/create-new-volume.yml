@@ -33,10 +33,9 @@ services:
         sudo -u postgres /usr/lib/postgresql/15/bin/pg_ctl -D "/var/lib/postgresql/data" -m fast -w stop
       }
 
-      apt-get update && apt-get install -y rsync
       mkdir -p /var/lib/postgresql/data
       chown -R 999:999 /var/lib/postgresql
-      rsync -a /original_volume/ /var/lib/postgresql/data
+      cp -a -T /original_volume/ /var/lib/postgresql/data
       ls -la /var/lib/postgresql/data
 
       docker_temp_server_start
