@@ -42,7 +42,8 @@ COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/pg_auto
 
 RUN apt-get update && apt-get install -y \
   sudo \
-  libncurses6 
+  libncurses6 \
+  rsync
 
 RUN mkdir -p /etc/pgaf/
 RUN mkdir -p /etc/pgaf/config
