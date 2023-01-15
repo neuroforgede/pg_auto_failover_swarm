@@ -11,7 +11,7 @@ x-monitor-volume: &monitor-node-volume
 services:
 
   monitor:
-    image: {{ pgaf_swarm_image }}{{ pgaf_swarm_version }}
+    image: {{ pgaf_swarm_image }}:{{ pgaf_swarm_version }}
     command: monitor
     networks:
       pgaf:
@@ -63,7 +63,7 @@ services:
 
 {% for postgres_node in postgres_nodes %}
   {{ postgres_node.name }}:
-    image: {{ pgaf_swarm_image }}{{ pgaf_swarm_version }}
+    image: {{ pgaf_swarm_image }}:{{ pgaf_swarm_version }}
     command: db-server
     networks:
       pgaf:
@@ -115,14 +115,11 @@ services:
 {% endfor %}
 
   admin:
-    image: {{ pgaf_swarm_image }}{{ pgaf_swarm_version }}
+    image: {{ pgaf_swarm_image }}:{{ pgaf_swarm_version }}
     entrypoint: /bin/bash -c 'tail -f /dev/null'
     command: []
     environment:
-      PGAF_NODE_LIST: >
-{% for postgres_node in postgres_nodes %}
-        {{ postgres_node.hostname }}
-{% endfor %}
+      PGAF_NODE_LIST: "{{ postgres_nodes | map(attribute='hostname') | join(',') }}"
     networks:
       pgaf:
     secrets:

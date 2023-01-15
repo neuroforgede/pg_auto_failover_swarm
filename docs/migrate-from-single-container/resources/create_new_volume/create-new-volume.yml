@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  initialize:
+    image: ubuntu
+    entrypoint:
+    - /bin/sh
+    - -c
+    - |
+      apt-get update && apt-get install -y rsync
+      mkdir -p /var/lib/postgresql/data
+      chown -R 999:999 /var/lib/postgresql
+      rsync -a /original_volume/ /var/lib/postgresql/data
+      ls -la /var/lib/postgresql/data
+    volumes:
+      - original_volume:/original_volume
+      - new_volume:/var/lib/postgresql
+    deploy:
+      restart_policy:
+        condition: none
+
+volumes:
+  original_volume:
+    name: "my_postgres_data"
+  # the new volume name
+  # if we name it properly here, we do not have to customize this logic later
+  # <stack_name>_vol_<node_name>
+  new_volume:
+    name: "pgaf_test_vol_node_1"

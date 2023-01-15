@@ -1,4 +1,4 @@
-# pg_auto_failover_swarm
+# pg_auto_failover_swarm (pgaf-swarm)
 
 ![](https://img.shields.io/docker/pulls/neuroforgede/pgaf-swarm.svg)
 

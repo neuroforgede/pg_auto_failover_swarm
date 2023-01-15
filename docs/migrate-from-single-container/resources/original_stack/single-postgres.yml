@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: "mypguser"
+      POSTGRES_PASSWORD: "mypgpassword"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      update_config:
+        order: stop-first
+        parallelism: 1
+      rollback_config:
+        order: stop-first
+        parallelism: 1
+      mode: replicated
+      replicas: 1
+    networks:
+      postgres_network:
+        aliases:
+          - "postgres.local"
+
+networks:
+  postgres_network:
+    driver: overlay
+    attachable: true
+
+volumes:
+  postgres_data:
+    name: "my_postgres_data"
