@@ -33,7 +33,15 @@ services:
         sudo -u postgres /usr/lib/postgresql/15/bin/pg_ctl -D "/var/lib/postgresql/data" -m fast -w stop
       }
 
-      mkdir -p /var/lib/postgresql/data
+      if [ -d /var/lib/postgresql/data ]; then
+        # the directory exists
+        if [ "$$(ls -A /var/lib/postgresql/data)" ]; then
+          echo "/var/lib/postgresql/data is not empty, will not run migration..."
+          exit 1
+        fi
+      else
+        mkdir -p /var/lib/postgresql/data  
+      fi
       chown -R 999:999 /var/lib/postgresql
       cp -a -T /original_volume/ /var/lib/postgresql/data
       ls -la /var/lib/postgresql/data
