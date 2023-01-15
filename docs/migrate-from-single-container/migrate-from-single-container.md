@@ -217,5 +217,7 @@ To verify that everything has worked, we can now open a bash in the pgaf admin c
 
 ```bash
 docker exec -it $(docker ps -q --filter name=pgaf_test_admin) bash
-pgaf psql -U mypguser -c 'SELECT count(*) FROM MyTestTable'
+pgaf psql 
+\c mypguser
+SELECT count(*) FROM MyTestTable;
 ```

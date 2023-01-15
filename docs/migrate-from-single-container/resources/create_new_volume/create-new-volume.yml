@@ -2,16 +2,50 @@ version: '3.8'
 
 services:
   initialize:
-    image: ubuntu
+    # we use the same image, no need to download more
+    image: ghcr.io/neuroforgede/pgaf-swarm:0.1.5-15
+    environment:
+      POSTGRES_ADMIN_USER: "mypguser"
+      POSTGRES_PASSWORD: "mypgpassword"
+    # FIXME: add this script to the actual pgaf-swarm Dockerfile. This is useful
     entrypoint:
-    - /bin/sh
+    - /bin/bash
     - -c
     - |
+      docker_temp_server_start() {
+        if [ "$$1" = 'postgres' ]; then
+          shift
+        fi
+
+        # internal start of server in order to allow setup using psql client
+        # does not listen on external TCP/IP and waits until start finishes
+        set -- "$$@" -c listen_addresses='' -p "$${PGPORT:-5432}"
+
+        PGUSER="$${PGUSER:-$$POSTGRES_USER}" \
+        sudo -u postgres /usr/lib/postgresql/15/bin/pg_ctl -D "/var/lib/postgresql/data" \
+          -o "$$(printf '%q ' "$$@")" \
+          -w start
+      }
+
+      # stop postgresql server after done setting up user and running scripts
+      docker_temp_server_stop() {
+        PGUSER="$${PGUSER:-postgres}" \
+        sudo -u postgres /usr/lib/postgresql/15/bin/pg_ctl -D "/var/lib/postgresql/data" -m fast -w stop
+      }
+
       apt-get update && apt-get install -y rsync
       mkdir -p /var/lib/postgresql/data
       chown -R 999:999 /var/lib/postgresql
       rsync -a /original_volume/ /var/lib/postgresql/data
       ls -la /var/lib/postgresql/data
+
+      docker_temp_server_start
+
+      # check if postgres user already exists
+      sudo -u postgres psql -U postgres template1 -c "SELECT 1" || sudo -u postgres createuser --superuser -U "$$POSTGRES_ADMIN_USER" postgres
+      sudo -u postgres psql -U postgres template1 -c "SELECT 1" || exit 1
+
+      docker_temp_server_stop
     volumes:
       - original_volume:/original_volume
       - new_volume:/var/lib/postgresql
