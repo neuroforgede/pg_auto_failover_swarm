@@ -96,7 +96,11 @@ local     pgaf_test_vol_node_1
 
 ## Create postgres role in data
 
-TODO
+1. run postgres:15 container with the copied database image
+2. create `postgres` user
+3. assign admin permissions to `postgres` user
+
+TODO: write the step by step guide
 
 ## Spin up the HA cluster with one data node
 
