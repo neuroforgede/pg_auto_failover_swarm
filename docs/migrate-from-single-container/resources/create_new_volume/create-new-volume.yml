@@ -3,7 +3,7 @@ version: '3.8'
 services:
   initialize:
     # we use the same image, no need to download more
-    image: ghcr.io/neuroforgede/pgaf-swarm:0.1.5-15
+    image: ghcr.io/neuroforgede/pgaf-swarm:0.1.7-15
     environment:
       POSTGRES_ADMIN_USER: "mypguser"
       POSTGRES_PASSWORD: "mypgpassword"
