@@ -6,7 +6,6 @@ services:
     image: ghcr.io/neuroforgede/pgaf-swarm:0.1.7-15
     environment:
       POSTGRES_ADMIN_USER: "mypguser"
-      POSTGRES_PASSWORD: "mypgpassword"
     # FIXME: add this script to the actual pgaf-swarm Dockerfile. This is useful
     entrypoint:
     - /bin/bash
