@@ -4,6 +4,9 @@ Operating pg_auto_failover_swarm (pgaf-swarm for short) is intended to be as sim
 This includes migrating from a PoC deployment of a Postgres container in Docker Swarm to a fully HA capable
 deployment. Following will be a step-by-step guide on how to achieve this.
 
+The lab assumes that you are running this on a single node swarm as it makes the steps simpler when it comes
+to watching the logs / executing into the shells. The concepts in this lab are transferrable to multinode deployments, though.
+
 ## Setup some variables to make the commands easier
 
 ```bash
