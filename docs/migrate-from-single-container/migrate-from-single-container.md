@@ -142,13 +142,6 @@ postgres_nodes:
 monitor_node_hostname: "monitor.local"
 
 monitor_node_volume_config: {}
-  # driver: hetzner-volume
-  # driver_opts:
-  #   name: "monitor"
-  #   size: '10'
-  #   fstype: ext4
-  #   uid: "999"
-  #   gid: "999"
 
 # this is the default, but can be overridden
 monitor_node_pgdata: "/var/lib/postgresql/data"
