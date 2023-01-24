@@ -1,7 +1,20 @@
 ARG POSTGRES_VERSION
 FROM postgres:$POSTGRES_VERSION as pg_base
 
-FROM pg_base as pgaf_build
+FROM pg_base as citus
+
+ARG POSTGRES_MAJOR_VERSION
+ARG CITUSTAG=v11.1.5
+
+ENV PG_CONFIG /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/pg_config
+
+RUN git clone -b ${CITUSTAG} --depth 1 https://github.com/citusdata/citus.git /usr/src/citus
+WORKDIR /usr/src/citus
+
+RUN ./configure
+RUN make -s clean && make -s -j8 install
+
+FROM citus as pgaf_build
 ARG POSTGRES_VERSION
 ARG POSTGRES_MAJOR_VERSION
 ARG PG_AUTO_FAILOVER_VERSION=2.0
@@ -35,6 +48,9 @@ ARG POSTGRES_VERSION
 ARG POSTGRES_MAJOR_VERSION
 ENV POSTGRES_MAJOR_VERSION=$POSTGRES_MAJOR_VERSION
 COPY --from=pg_base / /
+
+COPY --from=build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/citus*.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
+COPY --from=build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/citus* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
 
 COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/pgautofailover.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
 COPY --from=pgaf_build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/pgautofailover* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
