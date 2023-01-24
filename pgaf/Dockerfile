@@ -16,7 +16,8 @@ RUN apt-get update && apt-get install -y \
   liblz4-dev \
   libpam-dev \
   libreadline-dev \
-  zlib1g-dev
+  zlib1g-dev \
+  git
 
 FROM base_build as citus
 
