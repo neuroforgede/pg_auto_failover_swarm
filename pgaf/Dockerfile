@@ -14,7 +14,22 @@ WORKDIR /usr/src/citus
 RUN ./configure
 RUN make -s clean && make -s -j8 install
 
-FROM citus as pgaf_build
+FROM citus as pg_cron
+
+
+ARG POSTGRES_MAJOR_VERSION
+ARG PG_CRON_TAG=v1.4.2
+
+ENV PG_CONFIG /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/pg_config
+
+RUN git clone -b ${PG_CRON_TAG} --depth 1 https://github.com/citusdata/pg_cron.git /usr/src/pg_cron
+WORKDIR /usr/src/pg_cron
+
+RUN ./configure
+RUN make -s clean && make -s -j8 install
+
+
+FROM pg_cron as pgaf_build
 ARG POSTGRES_VERSION
 ARG POSTGRES_MAJOR_VERSION
 ARG PG_AUTO_FAILOVER_VERSION=2.0
@@ -49,8 +64,11 @@ ARG POSTGRES_MAJOR_VERSION
 ENV POSTGRES_MAJOR_VERSION=$POSTGRES_MAJOR_VERSION
 COPY --from=pg_base / /
 
-COPY --from=build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/citus*.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
-COPY --from=build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/citus* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
+COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/pg_cron*.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
+COPY --from=pgaf_build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/pg_cron* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
+
+COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/citus*.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
+COPY --from=pgaf_build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/citus* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
 
 COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/pgautofailover.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
 COPY --from=pgaf_build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/pgautofailover* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
