@@ -82,13 +82,13 @@ create_postgres() {
 }
 
 setup_pg_ident_conf() {
-  cp /etc/pgaf/config/pg_ident.conf $PGDATA/pg_ident.conf
-  check_result "failed to copy /etc/pgaf/config/pg_ident.conf to $PGDATA/pg_ident.conf"
+  cp /etc/pgaf/pg_ident.conf $PGDATA/pg_ident.conf
+  check_result "failed to copy /etc/pgaf/pg_ident.conf to $PGDATA/pg_ident.conf"
 }
 
 setup_postgresql_conf() {
-  cp /etc/pgaf/config/postgresql.custom.conf $PGDATA/postgresql.custom.conf
-  check_result "failed to copy /etc/pgaf/config/postgresql.custom.conf to $PGDATA/postgresql.custom.conf"
+  cp /etc/pgaf/postgresql.custom.conf $PGDATA/postgresql.custom.conf
+  check_result "failed to copy /etc/pgaf/postgresql.custom.conf to $PGDATA/postgresql.custom.conf"
   chown postgres:postgres $PGDATA/postgresql.custom.conf
   check_result "failed to chown postgres:postgres to $PGDATA/postgresql.custom.conf"
   LINE="include 'postgresql.custom.conf'"
@@ -98,8 +98,8 @@ setup_postgresql_conf() {
 }
 
 setup_hba() {
-  cp /etc/pgaf/config/pg_hba.conf $PGDATA/pg_hba.conf
-  check_result "failed to copy /etc/pgaf/config/pg_hba.conf to $PGDATA/pg_hba.conf"
+  cp /etc/pgaf/pg_hba.conf $PGDATA/pg_hba.conf
+  check_result "failed to copy /etc/pgaf/pg_hba.conf to $PGDATA/pg_hba.conf"
   chown postgres:postgres $PGDATA/pg_hba.conf
   check_result "failed to chown postgres:postgres to $PGDATA/pg_hba.conf"
 }

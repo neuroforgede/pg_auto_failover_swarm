@@ -81,10 +81,8 @@ RUN apt-get update && apt-get install -y \
   libncurses6 \
   libcurl4-gnutls-dev
 
-
 RUN mkdir -p /etc/pgaf/
-RUN mkdir -p /etc/pgaf/config
-COPY config /etc/pgaf/config/
+COPY config /etc/pgaf/
 
 COPY pgaf.sh /usr/bin/pgaf
 RUN chmod +x /usr/bin/pgaf
