@@ -42,7 +42,6 @@ ENV PG_CONFIG /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/pg_config
 RUN git clone -b ${PG_CRON_TAG} --depth 1 https://github.com/citusdata/pg_cron.git /usr/src/pg_cron
 WORKDIR /usr/src/pg_cron
 
-RUN ./configure
 RUN make -s clean && make -s -j8 install
 
 FROM base_build as pg_auto_failover
