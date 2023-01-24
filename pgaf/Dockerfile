@@ -78,7 +78,9 @@ COPY --from=pg_auto_failover /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/p
 
 RUN apt-get update && apt-get install -y \
   sudo \
-  libncurses6
+  libncurses6 \
+  libcurl4-gnutls-dev
+
 
 RUN mkdir -p /etc/pgaf/
 RUN mkdir -p /etc/pgaf/config
