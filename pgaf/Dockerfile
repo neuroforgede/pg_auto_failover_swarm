@@ -14,8 +14,7 @@ WORKDIR /usr/src/citus
 RUN ./configure
 RUN make -s clean && make -s -j8 install
 
-FROM citus as pg_cron
-
+FROM pg_base as pg_cron
 
 ARG POSTGRES_MAJOR_VERSION
 ARG PG_CRON_TAG=v1.4.2
@@ -28,8 +27,7 @@ WORKDIR /usr/src/pg_cron
 RUN ./configure
 RUN make -s clean && make -s -j8 install
 
-
-FROM pg_cron as pgaf_build
+FROM pg_base as pg_auto_failover
 ARG POSTGRES_VERSION
 ARG POSTGRES_MAJOR_VERSION
 ARG PG_AUTO_FAILOVER_VERSION=2.0
@@ -64,15 +62,15 @@ ARG POSTGRES_MAJOR_VERSION
 ENV POSTGRES_MAJOR_VERSION=$POSTGRES_MAJOR_VERSION
 COPY --from=pg_base / /
 
-COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/pg_cron*.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
-COPY --from=pgaf_build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/pg_cron* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
+COPY --from=pg_cron /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/pg_cron*.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
+COPY --from=pg_cron /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/pg_cron* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
 
-COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/citus*.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
-COPY --from=pgaf_build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/citus* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
+COPY --from=citus /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/citus*.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
+COPY --from=citus /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/citus* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
 
-COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/pgautofailover.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
-COPY --from=pgaf_build /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/pgautofailover* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
-COPY --from=pgaf_build /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/pg_autoctl /usr/local/bin
+COPY --from=pg_auto_failover /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib/pgautofailover.so /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/lib
+COPY --from=pg_auto_failover /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/pgautofailover* /usr/share/postgresql/${POSTGRES_MAJOR_VERSION}/extension/
+COPY --from=pg_auto_failover /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/pg_autoctl /usr/local/bin
 
 RUN apt-get update && apt-get install -y \
   sudo \
