@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
   make \
   postgresql-server-dev-${POSTGRES_MAJOR_VERSION} \
   libkrb5-dev \
+  libcurl4-gnutls-dev \
   libselinux1-dev \
   libxslt1-dev \
   libzstd-dev \
