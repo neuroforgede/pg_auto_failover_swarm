@@ -113,12 +113,6 @@ run_pg_autoctl() {
   exec sudo PGDATA=$PGDATA -u postgres /usr/local/bin/pg_autoctl "$@"
 }
 
-run_single(){
-  exec sudo PGDATA=$PGDATA -u postgres \
-    /usr/lib/postgresql/$POSTGRES_MAJOR_VERSION/bin/pg_ctl \
-    -w
-}
-
 run_sql() {
   exec sudo PGDATA=$PGDATA -u postgres psql \
     "host=$PGAF_NODE_LIST \
@@ -149,15 +143,6 @@ db-server)
   setup_postgresql_conf
   setup_hba
   pg_autoctl_run
-  ;;
-db-server-single)
-  docker_setup_env
-  docker_create_db_directories
-  create_postgres
-  setup_pg_ident_conf
-  setup_postgresql_conf
-  setup_hba
-  run_single
   ;;
 psql)
   shift
