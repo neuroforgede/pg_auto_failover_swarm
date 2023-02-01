@@ -125,6 +125,17 @@ run_sql() {
     "$@"
 }
 
+run_standalone() {
+  # we just use the vanilla entrypoint
+  # this is mostly useful to use any
+  # precompiled binaries and for testing
+  # in docker-compose stacks locally where
+  # it does not make sense to spin up a multinode cluster
+  exec PATH="$PATH:/usr/lib/postgresql/$POSTGRES_MAJOR_VERSION/bin" \
+      PG_MAJOR=$POSTGRES_MAJOR_VERSION \
+    docker-entrypoint.sh "$@"
+}
+
 case "$1" in
 monitor)
   docker_setup_env
@@ -143,6 +154,10 @@ db-server)
   setup_postgresql_conf
   setup_hba
   pg_autoctl_run
+  ;;
+standalone)
+  shift
+  run_standalone "$@"
   ;;
 psql)
   shift
