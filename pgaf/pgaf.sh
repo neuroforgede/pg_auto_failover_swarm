@@ -131,9 +131,9 @@ run_standalone() {
   # precompiled binaries and for testing
   # in docker-compose stacks locally where
   # it does not make sense to spin up a multinode cluster
-  exec PATH="$PATH:/usr/lib/postgresql/$POSTGRES_MAJOR_VERSION/bin" \
-      PG_MAJOR=$POSTGRES_MAJOR_VERSION \
-    docker-entrypoint.sh "$@"
+  PATH="$PATH:/usr/lib/postgresql/$POSTGRES_MAJOR_VERSION/bin" 
+    PG_MAJOR=$POSTGRES_MAJOR_VERSION \ 
+    exec docker-entrypoint.sh "$@"
 }
 
 case "$1" in
