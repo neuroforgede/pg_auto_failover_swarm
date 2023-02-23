@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y \
 FROM base_build as citus
 
 ARG POSTGRES_MAJOR_VERSION
-ARG CITUSTAG=v11.1.5
+ARG CITUSTAG
 
 ENV PG_CONFIG /usr/lib/postgresql/${POSTGRES_MAJOR_VERSION}/bin/pg_config
 
