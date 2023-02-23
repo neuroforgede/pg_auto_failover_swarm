@@ -30,16 +30,16 @@ jobs:
         version:
           - postgres: "14"
             postgres_major: "14"
-            citus_version: "v11.1.5"
+            citus: "v11.1.5"
           - postgres: "14.6"
             postgres_major: "14"
-            citus_version: "v11.1.5"
+            citus: "v11.1.5"
           - postgres: "15"
             postgres_major: "15"
-            citus_version: "v11.1.5"
+            citus: "v11.1.5"
           - postgres: "15.1"
             postgres_major: "15"
-            citus_version: "v11.1.5"
+            citus: "v11.1.5"
 
     runs-on: ubuntu-latest
     permissions:
@@ -70,7 +70,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: |
-            suffix=-pg-${{ matrix.version.postgres }}-citus-${{ matrix.citus_version }}
+            suffix=-pg-${{ matrix.version.postgres }}-citus-${{ matrix.version.citus }}
             latest=false
 
       - name: Build and push Docker image
@@ -84,7 +84,7 @@ jobs:
           build-args: |
             POSTGRES_VERSION=${{ matrix.version.postgres }}
             POSTGRES_MAJOR_VERSION=${{ matrix.version.postgres_major }}
-            CITUS_TAG=${{ matrix.version.citus_version }}
+            CITUS_TAG=${{ matrix.version.citus }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
             
