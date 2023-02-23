@@ -40,7 +40,7 @@ jobs:
             postgres_major: "15"
             citus: "11.2.0"
             pg_cron: "1.4.2"
-          - postgres: "15.1"
+          - postgres: "15.2"
             postgres_major: "15"
             citus: "11.2.0"
             pg_cron: "1.4.2"
