@@ -84,7 +84,7 @@ jobs:
           build-args: |
             POSTGRES_VERSION=${{ matrix.version.postgres }}
             POSTGRES_MAJOR_VERSION=${{ matrix.version.postgres_major }}
-            CITUS_TAG=v${{ matrix.version.citus }}
+            CITUSTAG=v${{ matrix.version.citus }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
             
