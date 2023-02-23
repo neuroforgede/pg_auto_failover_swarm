@@ -30,7 +30,7 @@ echo "nothelm run deploy --project-dir $CHART_DIR --project-dir overrides -f val
 cat > $WORKDIR/values.yaml << EOF
 stack_name: "pgaf_test"
 
-pgaf_swarm_version: "0.2.1-15"
+pgaf_swarm_version: "0.3.0-pg-15-citus-11.2.0-pgcron-1.4.2"
 
 postgres_nodes:
   - name: "node_1"
