@@ -30,16 +30,20 @@ jobs:
         version:
           - postgres: "14"
             postgres_major: "14"
-            citus: "11.1.5"
+            citus: "11.2.0"
+            pg_cron: "1.4.2"
           - postgres: "14.6"
             postgres_major: "14"
-            citus: "11.1.5"
+            citus: "11.2.0"
+            pg_cron: "1.4.2"
           - postgres: "15"
             postgres_major: "15"
-            citus: "11.1.5"
+            citus: "11.2.0"
+            pg_cron: "1.4.2"
           - postgres: "15.1"
             postgres_major: "15"
-            citus: "11.1.5"
+            citus: "11.2.0"
+            pg_cron: "1.4.2"
 
     runs-on: ubuntu-latest
     permissions:
@@ -70,7 +74,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: |
-            suffix=-pg-${{ matrix.version.postgres }}-citus-${{ matrix.version.citus }}
+            suffix=-pg-${{ matrix.version.postgres }}-citus-${{ matrix.version.citus }}-pgcron-${{ matrix.version.pg_cron}}
             latest=false
 
       - name: Build and push Docker image
@@ -85,6 +89,7 @@ jobs:
             POSTGRES_VERSION=${{ matrix.version.postgres }}
             POSTGRES_MAJOR_VERSION=${{ matrix.version.postgres_major }}
             CITUSTAG=v${{ matrix.version.citus }}
+            PG_CRON_TAG=${{ matrix.version.pg_cron }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
             
