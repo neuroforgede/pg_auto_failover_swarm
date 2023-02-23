@@ -1,6 +1,6 @@
 # pg_auto_failover_swarm (pgaf-swarm)
 
-This repository contains all of the necessary things to have a pg_auto_failover cluster running in Docker Swarm.
+This repository contains all of the necessary things to have a pg_auto_failover cluster running in Docker Swarm. It also bundles the citus and pg_cron extension for ease of use.
 
 ## Why?
 
