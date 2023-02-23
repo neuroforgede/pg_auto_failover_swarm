@@ -30,16 +30,16 @@ jobs:
         version:
           - postgres: "14"
             postgres_major: "14"
-            citus_version: "11.5"
+            citus_version: "v11.1.5"
           - postgres: "14.6"
             postgres_major: "14"
-            citus_version: "11.5"
+            citus_version: "v11.1.5"
           - postgres: "15"
             postgres_major: "15"
-            citus_version: "11.5"
+            citus_version: "v11.1.5"
           - postgres: "15.1"
             postgres_major: "15"
-            citus_version: "11.5"
+            citus_version: "v11.1.5"
 
     runs-on: ubuntu-latest
     permissions:
