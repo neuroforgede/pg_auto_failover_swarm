@@ -74,7 +74,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: |
-            suffix=-pg-${{ matrix.version.postgres }}-citus-${{ matrix.version.citus }}-pgcron-${{ matrix.version.pg_cron}}
+            suffix=-pg-${{ matrix.version.postgres }}-citus-${{ matrix.version.citus }}-pgcron-${{ matrix.version.pg_cron }}
             latest=false
 
       - name: Build and push Docker image
