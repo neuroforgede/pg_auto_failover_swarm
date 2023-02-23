@@ -89,7 +89,7 @@ jobs:
             POSTGRES_VERSION=${{ matrix.version.postgres }}
             POSTGRES_MAJOR_VERSION=${{ matrix.version.postgres_major }}
             CITUSTAG=v${{ matrix.version.citus }}
-            PG_CRON_TAG=${{ matrix.version.pg_cron }}
+            PG_CRON_TAG=v${{ matrix.version.pg_cron }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
             
