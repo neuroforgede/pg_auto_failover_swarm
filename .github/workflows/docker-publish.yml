@@ -30,19 +30,19 @@ jobs:
         version:
           - postgres: "14"
             postgres_major: "14"
-            citus: "11.2.0"
+            citus: "11.2.1"
             pg_cron: "1.4.2"
           - postgres: "14.7"
             postgres_major: "14"
-            citus: "11.2.0"
+            citus: "11.2.1"
             pg_cron: "1.4.2"
           - postgres: "15"
             postgres_major: "15"
-            citus: "11.2.0"
+            citus: "11.2.1"
             pg_cron: "1.4.2"
           - postgres: "15.2"
             postgres_major: "15"
-            citus: "11.2.0"
+            citus: "11.2.1"
             pg_cron: "1.4.2"
 
     runs-on: ubuntu-latest
